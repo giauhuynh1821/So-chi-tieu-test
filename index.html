@@ -198,7 +198,7 @@ footer .in{max-width:480px;margin:0 auto}
 
 <script>
 /* ===== API_URL nằm trong file config.js (sửa một lần, không bị mất khi thay index.html) ===== */
-const APP_VERSION = 'v5 · 17/10';
+const APP_VERSION = 'v6 · 17/10';
 const API_URL = (window.APP_CONFIG && window.APP_CONFIG.API_URL) || '';
 const SEP = '.';            // dấu phân cách hàng nghìn: '.' (khớp sheet) hoặc ','
 const TZ = 'Asia/Ho_Chi_Minh';
@@ -242,8 +242,15 @@ async function api(action, payload) {
   try { data = await res.json(); } catch (e) {
     throw fail('Máy chủ không trả về dữ liệu hợp lệ. Kiểm tra Web App đã triển khai với quyền "Bất kỳ ai" và dùng bản triển khai mới nhất');
   }
+  showVer(data.v);
   if (!data.ok) throw new Error(data.error || 'Lỗi không xác định');
   return data;
+}
+
+// Hiện cạnh tiêu đề: bản app · bản API đang trả lời · đuôi link API (để đối chiếu với ID bản triển khai)
+function showVer(apiV) {
+  const tail = API_URL.replace(/\/exec$/, '').slice(-6);
+  $('ver').textContent = APP_VERSION + ' · ' + (apiV || 'API cũ') + ' · …' + tail;
 }
 
 let toastTimer;
