@@ -64,7 +64,7 @@ footer .in{max-width:480px;margin:0 auto}
 #toast.show{opacity:1}
 .pendingbar{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px 8px 8px 14px;margin-bottom:16px;font-size:13px;color:var(--muted)}
 .pendingbar button{height:36px;padding:0 14px;border-radius:18px;border:1px solid var(--line);background:var(--card);font-size:13px;font-weight:500;cursor:pointer}
-#ver{font-size:11px;font-weight:500;color:var(--muted);margin-left:8px}
+.appver{text-align:center;color:var(--muted);font-size:12px;margin-top:28px}
 .tbl{width:100%;border-collapse:collapse;font-size:14px}
 .tbl th{font-size:12px;text-align:left;color:var(--muted);font-weight:600;padding:8px 6px;border-bottom:1px solid var(--line)}
 .tbl td{padding:10px 6px;border-bottom:1px solid var(--line)}
@@ -76,13 +76,17 @@ footer .in{max-width:480px;margin:0 auto}
 .tbl tr.total td{font-weight:700;border-bottom:0;background:var(--seg)}
 .tbl tbody tr[data-pick]{cursor:pointer}
 .card.tight{padding:8px 14px}
-.seg.tabs{overflow-x:auto}
-.seg.tabs button{flex:1 0 auto;padding:0 12px;font-size:13px;white-space:nowrap}
+.seg.tabs{overflow:hidden}
+.seg.tabs button{flex:1 1 0;min-width:0;padding:0 2px;font-size:13px;white-space:nowrap}
 .seg.small button{height:36px;font-size:13px;border-radius:10px}
-.band{background:var(--ink);color:var(--bg);border-radius:20px;padding:16px 20px;margin-bottom:16px;display:flex;flex-direction:column;gap:2px}
-.band .bl{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;opacity:.75}
-.band .bn{font-size:30px;font-weight:700}
-.band .bs{font-size:13px;opacity:.8}
+.band{background:var(--card);border-radius:20px;padding:14px 18px;margin-bottom:16px;display:flex;flex-direction:column;gap:6px}
+.band .bal{display:flex;align-items:baseline;gap:10px}
+.band .bl{font-size:14px;font-weight:500;color:var(--muted)}
+.band .bn{font-size:28px;font-weight:700;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.band .tc{display:flex;gap:22px;font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}
+.band .tc i{font-style:normal;font-size:10px;margin-right:6px}
+.band .in{color:var(--thu)}
+.band .out{color:var(--chi)}
 .sum.three b{font-size:15px}
 .nav{display:flex;align-items:center;justify-content:space-between;margin:4px 0 12px}
 .nav button{width:44px;height:44px;border-radius:22px;border:1px solid var(--line);background:var(--card);font-size:20px;cursor:pointer}
@@ -98,7 +102,7 @@ footer .in{max-width:480px;margin:0 auto}
 <body>
 <div id="app">
   <header>
-    <h1>Sổ chi tiêu<small id="ver"></small></h1>
+    <h1>Sổ chi tiêu</h1>
     <input id="date" class="pill" type="date" aria-label="Ngày giao dịch">
   </header>
 
@@ -191,6 +195,8 @@ footer .in{max-width:480px;margin:0 auto}
     <span class="label">Giao dịch tín dụng trong tháng</span>
     <div class="card tight" id="crList"></div>
   </div>
+
+  <div id="appVer" class="appver"></div>
 </div>
 
 <footer id="saveBar"><div class="in"><button id="saveBtn" class="save" type="button">Lưu giao dịch</button></div></footer>
@@ -198,7 +204,7 @@ footer .in{max-width:480px;margin:0 auto}
 
 <script>
 /* ===== API_URL nằm trong file config.js (sửa một lần, không bị mất khi thay index.html) ===== */
-const APP_VERSION = 'v6 · 17/10';
+const APP_VERSION = 'v7';
 const API_URL = (window.APP_CONFIG && window.APP_CONFIG.API_URL) || '';
 const SEP = '.';            // dấu phân cách hàng nghìn: '.' (khớp sheet) hoặc ','
 const TZ = 'Asia/Ho_Chi_Minh';
@@ -211,7 +217,7 @@ const dark = tg ? tg.colorScheme === 'dark' : window.matchMedia('(prefers-color-
 if (dark) root.dataset.theme = 'dark';
 
 const $ = id => document.getElementById(id);
-$('ver').textContent = APP_VERSION;
+$('appVer').textContent = APP_VERSION;
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const fmt = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, SEP);
 const todayStr = () => new Date().toLocaleDateString('en-CA', { timeZone: TZ });
@@ -250,7 +256,8 @@ async function api(action, payload) {
 // Hiện cạnh tiêu đề: bản app · bản API đang trả lời · đuôi link API (để đối chiếu với ID bản triển khai)
 function showVer(apiV) {
   const tail = API_URL.replace(/\/exec$/, '').slice(-6);
-  $('ver').textContent = APP_VERSION + ' · ' + (apiV || 'API cũ') + ' · …' + tail;
+  // Chỉ hiện số phiên bản app; thông tin API chỉ xem khi rê chuột/nhấn giữ
+  $('appVer').title = APP_VERSION + ' · ' + (apiV || 'API cũ') + ' · …' + tail;
 }
 
 let toastTimer;
@@ -446,9 +453,9 @@ function renderBalance(b) {
   const bal = b.thu - b.chi;
   const el = $('balBand');
   el.classList.remove('hide');
-  el.innerHTML = `<span class="bl">Số dư còn lại · Tháng ${b.m}/${b.y}</span>` +
-    `<b class="bn">${bal < 0 ? '-' : ''}${fmt(Math.abs(bal))}đ</b>` +
-    `<span class="bs">Thu ${fmt(b.thu)}đ · Chi ${fmt(b.chi)}đ</span>`;
+  el.innerHTML = `<div class="bal"><span class="bl">Còn lại</span><b class="bn">${bal < 0 ? '-' : ''}${fmt(Math.abs(bal))}đ</b></div>` +
+    `<div class="tc"><span class="in" title="Thu" aria-label="Thu ${fmt(b.thu)} đồng"><i aria-hidden="true">▲</i>${fmt(b.thu)}đ</span>` +
+    `<span class="out" title="Chi" aria-label="Chi ${fmt(b.chi)} đồng"><i aria-hidden="true">▼</i>${fmt(b.chi)}đ</span></div>`;
 }
 async function loadBalance() {
   const [y, m] = todayStr().slice(0, 7).split('-').map(Number);
