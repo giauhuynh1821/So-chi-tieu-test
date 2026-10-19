@@ -12,11 +12,11 @@
 <style>
 :root{
   --bg:#F3F5F9; --card:#FFFFFF; --ink:#172033; --muted:#667085; --line:#D5DAE3; --seg:#E4E8F0;
-  --chi:#C2410C; --thu:#0369A1; --on-accent:#FFFFFF; --danger:#B42318;
+  --chi:#c62828; --thu:#2e7d32; --on-accent:#FFFFFF; --danger:#B42318;
 }
 :root[data-theme="dark"]{
   --bg:#0F141C; --card:#1A222E; --ink:#E8ECF3; --muted:#9AA4B5; --line:#2E3849; --seg:#232C3A;
-  --chi:#FB923C; --thu:#38BDF8; --on-accent:#10161F; --danger:#F97066;
+  --chi:#EF5350; --thu:#66BB6A; --on-accent:#10161F; --danger:#F97066;
 }
 :root[data-type="chi"]{--accent:var(--chi)}
 :root[data-type="thu"]{--accent:var(--thu)}
@@ -88,6 +88,11 @@ footer .in{max-width:480px;margin:0 auto}
 .band .in{color:var(--thu)}
 .band .out{color:var(--chi)}
 .sum.three b{font-size:15px}
+.cap{display:block;font-size:11px;line-height:1.35;color:var(--muted);margin-top:2px}
+.sum .mv{display:flex;align-items:baseline;gap:6px}
+.sum .mv i{font-style:normal;font-size:12px}
+.sum .mv b{font-size:22px;margin-top:0}
+#crSt,#crDue{font-size:18px}
 .nav{display:flex;align-items:center;justify-content:space-between;margin:4px 0 12px}
 .nav button{width:44px;height:44px;border-radius:22px;border:1px solid var(--line);background:var(--card);font-size:20px;cursor:pointer}
 .nav span{font-weight:600;font-size:15px}
@@ -145,8 +150,8 @@ footer .in{max-width:480px;margin:0 auto}
   <!-- TAB TRA CỨU -->
   <div id="view-lookup" class="hide">
     <div class="sum">
-      <div class="card"><span class="label" style="margin:0">Chi</span><b id="sumChi" style="color:var(--chi)">0đ</b><span class="muted" id="cntChi"></span></div>
-      <div class="card"><span class="label" style="margin:0">Thu</span><b id="sumThu" style="color:var(--thu)">0đ</b><span class="muted" id="cntThu"></span></div>
+      <div class="card"><div class="mv" role="group" aria-label="Chi" style="color:var(--chi)"><i aria-hidden="true">▼</i><b id="sumChi">0đ</b></div><span class="cap" id="cntChi"></span></div>
+      <div class="card"><div class="mv" role="group" aria-label="Thu" style="color:var(--thu)"><i aria-hidden="true">▲</i><b id="sumThu">0đ</b></div><span class="cap" id="cntThu"></span></div>
     </div>
     <div class="card" id="dayList"><span class="muted">Đang tải...</span></div>
   </div>
@@ -187,8 +192,8 @@ footer .in{max-width:480px;margin:0 auto}
   <!-- TAB TÍN DỤNG -->
   <div id="view-credit" class="hide">
     <div class="sum">
-      <div class="card"><span class="label" style="margin:0 0 4px">Ngày sao kê</span><b id="crSt">–</b><span class="muted" id="crStSub"></span></div>
-      <div class="card"><span class="label" style="margin:0 0 4px">Ngày cần thanh toán</span><b id="crDue">–</b><span class="muted" id="crDueSub"></span></div>
+      <div class="card"><span class="label" style="margin:0 0 4px">Ngày sao kê</span><b id="crSt">–</b><span class="cap" id="crStSub"></span></div>
+      <div class="card"><span class="label" style="margin:0 0 4px">Ngày cần thanh toán</span><b id="crDue">–</b><span class="cap" id="crDueSub"></span></div>
     </div>
     <div class="card" id="crCycle" style="margin-bottom:16px"><span class="muted">Đang tải...</span></div>
     <div style="margin-bottom:12px"><input id="creditMonth" class="pill" type="month" aria-label="Chọn tháng"></div>
@@ -204,7 +209,7 @@ footer .in{max-width:480px;margin:0 auto}
 
 <script>
 /* ===== API_URL nằm trong file config.js (sửa một lần, không bị mất khi thay index.html) ===== */
-const APP_VERSION = 'v7';
+const APP_VERSION = 'v8';
 const API_URL = (window.APP_CONFIG && window.APP_CONFIG.API_URL) || '';
 const SEP = '.';            // dấu phân cách hàng nghìn: '.' (khớp sheet) hoặc ','
 const TZ = 'Asia/Ho_Chi_Minh';
@@ -483,6 +488,7 @@ const toUTC = k => { const [y, m, d] = k.split('-').map(Number); return new Date
 const dkey = dt => dt.getUTCFullYear() + '-' + pad2(dt.getUTCMonth() + 1) + '-' + pad2(dt.getUTCDate());
 const addDays = (k, n) => dkey(new Date(toUTC(k).getTime() + n * 864e5));
 const fmtDM = k => k.slice(8, 10) + '/' + k.slice(5, 7);
+const fmtDMY = k => k.slice(8, 10) + '/' + k.slice(5, 7) + '/' + k.slice(0, 4);
 
 function chartRange() {
   const [y, m] = chart.ref.split('-').map(Number);
@@ -570,14 +576,14 @@ async function loadCredit() {
     }
     const left = n => n.daysLeft === 0 ? 'Hôm nay' : 'Còn ' + n.daysLeft + ' ngày';
     const st = d.nextStatement, du = d.nextDue;
-    $('crSt').textContent = st ? fmtDM(st.date) : (d.statementRaw || '–');
+    $('crSt').textContent = st ? fmtDMY(st.date) : (d.statementRaw || '–');
     $('crStSub').textContent = st ? left(st) + ' · hằng tháng ngày ' + d.statementDay : 'Chưa đọc được trong sheet';
-    $('crDue').textContent = du ? fmtDM(du.date) : (d.dueRaw || '–');
+    $('crDue').textContent = du ? fmtDMY(du.date) : (d.dueRaw || '–');
     $('crDue').style.color = du && du.daysLeft <= 3 ? 'var(--danger)' : '';
     $('crDueSub').textContent = du ? left(du) + ' · hằng tháng ngày ' + d.dueDay : 'Chưa đọc được trong sheet';
 
     $('crCycle').innerHTML = d.cycle
-      ? `<span class="label" style="margin-bottom:4px">Kỳ sao kê hiện tại · ${fmtDM(d.cycle.from)} – ${fmtDM(d.cycle.to)}</span>
+      ? `<span class="label" style="margin-bottom:4px">Kỳ sao kê hiện tại · ${fmtDMY(d.cycle.from)} – ${fmtDMY(d.cycle.to)}</span>
          <b style="font-size:24px;color:var(--chi)">${fmt(d.cycle.total)}đ</b> <span class="muted">· ${d.cycle.count} giao dịch</span>`
       : '<span class="muted">Chưa xác định được ngày sao kê nên chưa tính kỳ hiện tại.</span>';
 
