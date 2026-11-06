@@ -217,7 +217,7 @@ footer .in{max-width:480px;margin:0 auto}
 
 <script>
 /* ===== API_URL nằm trong file config.js (sửa một lần, không bị mất khi thay index.html) ===== */
-const APP_VERSION = 'v11';
+const APP_VERSION = 'v13';
 const API_URL = (window.APP_CONFIG && window.APP_CONFIG.API_URL) || '';
 const SEP = '.';            // dấu phân cách hàng nghìn: '.' (khớp sheet) hoặc ','
 const TZ = 'Asia/Ho_Chi_Minh';
@@ -233,6 +233,11 @@ const $ = id => document.getElementById(id);
 $('appVer').textContent = 'Mini App ' + APP_VERSION + ' · API đang kết nối…';
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const fmt = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, SEP);
+const moneyNumber = v => {
+  if (typeof v === 'number') return Number.isFinite(v) ? v : 0;
+  const n = Number(String(v ?? '').trim().replace(/[^\\d-]/g, ''));
+  return Number.isFinite(n) ? n : 0;
+};
 const todayStr = () => new Date().toLocaleDateString('en-CA', { timeZone: TZ });
 const uniq = a => a.filter((v, i) => a.indexOf(v) === i);
 
@@ -414,7 +419,7 @@ async function syncQueue() {
   } finally {
     syncing = false; renderPending();
     if (savedAny && !getQ().length) {
-      try { const m = await api('meta'); applyMeta(m); localStorage.setItem('meta_v1', JSON.stringify(m)); } catch (e) {}
+      try { const m = await api('meta'); applyMeta(m); localStorage.setItem('meta_v3', JSON.stringify(m)); } catch (e) {}
     }
     refreshActive();
   }
@@ -443,14 +448,19 @@ async function loadDay() {
   $('dayList').innerHTML = '<span class="muted">Đang tải...</span>';
   try {
     const d = await api('day', { date: state.date });
-    $('sumChi').textContent = fmt(d.totalChi) + 'đ'; $('cntChi').textContent = d.countChi + ' giao dịch';
-    $('sumThu').textContent = fmt(d.totalThu) + 'đ'; $('cntThu').textContent = d.countThu + ' giao dịch';
-    $('dayList').innerHTML = d.items.length ? d.items.map(it => `
+    const totalChi = moneyNumber(d.totalChi);
+    const totalThu = moneyNumber(d.totalThu);
+    $('sumChi').textContent = fmt(totalChi) + 'đ'; $('cntChi').textContent = d.countChi + ' giao dịch';
+    $('sumThu').textContent = fmt(totalThu) + 'đ'; $('cntThu').textContent = d.countThu + ' giao dịch';
+    $('dayList').innerHTML = d.items.length ? d.items.map(it => {
+      const amount = moneyNumber(it.money);
+      return `
       <div class="item">
         <div><div>${esc(it.menu)}${it.sub ? ' · ' + esc(it.sub) : ''}</div>
         <small>${esc(it.source)}${it.person ? ' · ' + esc(it.person) : ''}${it.note ? ' · ' + esc(it.note) : ''}</small></div>
-        <div class="amt" style="color:var(--${it.type === 'Thu' ? 'thu' : 'chi'})">${it.type === 'Thu' ? '+' : '-'}${fmt(it.money)}đ</div>
-      </div>`).join('') : '<span class="muted">Ngày này chưa có giao dịch nào.</span>';
+        <div class="amt" style="color:var(--${it.type === 'Thu' ? 'thu' : 'chi'})">${it.type === 'Thu' ? '+' : '-'}${fmt(amount)}đ</div>
+      </div>`;
+    }).join('') : '<span class="muted">Ngày này chưa có giao dịch nào.</span>';
   } catch (err) {
     $('dayList').innerHTML = '<span class="err">Lỗi: ' + esc(err.message) + '</span>';
   }
@@ -646,13 +656,13 @@ async function init() {
   } catch (e) {}
   // Hiện ngay danh mục đã nhớ từ lần trước, rồi cập nhật ngầm
   try {
-    const cached = JSON.parse(localStorage.getItem('meta_v1') || 'null');
+    const cached = JSON.parse(localStorage.getItem('meta_v3') || 'null');
     if (cached) applyMeta(cached);
   } catch (e) {}
   syncQueue();   // gửi nốt các giao dịch còn chờ từ lần trước
   try {
     const m = await api('meta');
-    try { localStorage.setItem('meta_v1', JSON.stringify(m)); } catch (e) {}
+    try { localStorage.setItem('meta_v3', JSON.stringify(m)); } catch (e) {}
     applyMeta(m);
   } catch (err) {
     if (!state.loaded) $('menuBox').innerHTML = '<span class="err">Không tải được danh mục: ' + esc(err.message) + '</span>';
