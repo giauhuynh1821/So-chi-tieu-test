@@ -107,11 +107,7 @@ footer .in{max-width:480px;margin:0 auto}
 <body>
 <div id="app">
   <header>
-    <div>
-      <h1>Sổ chi tiêu</h1>
-      <span class="cap">Ngày giao dịch</span>
-    </div>
-    <input id="date" class="pill" type="date" aria-label="Ngày giao dịch">
+    <h1>Sổ chi tiêu</h1>
   </header>
 
   <div id="balBand" class="band hide" role="status"></div>
@@ -129,18 +125,20 @@ footer .in{max-width:480px;margin:0 auto}
   <!-- TAB GHI CHÉP -->
   <div id="view-form">
     <section>
-      <span class="label">2. Loại giao dịch</span>
-      <div class="seg" role="group" aria-label="Loại giao dịch">
-        <button type="button" data-pick="type" data-v="Chi" class="on">Chi</button>
-        <button type="button" data-pick="type" data-v="Thu">Thu</button>
-      </div>
+      <label class="label" for="date">1. Ngày giao dịch</label>
+      <input id="date" class="field" type="date" aria-label="Ngày giao dịch">
     </section>
+    <div class="seg" role="group" aria-label="Loại giao dịch">
+      <span class="label" style="display:none">2. Loại giao dịch</span>
+      <button type="button" data-pick="type" data-v="Chi" class="on">Chi</button>
+      <button type="button" data-pick="type" data-v="Thu">Thu</button>
+    </div>
 
     <section><span class="label">3. Nguồn tiền</span><div id="srcBox" class="row"></div></section>
     <section><span class="label">4. Danh mục</span><div id="menuBox"><span class="muted">Đang tải danh mục...</span></div></section>
-    <section id="subSec" class="hide"><span class="label">5. Mục con · theo danh mục đã chọn</span><div id="subBox" class="row"></div></section>
-    <section id="peopleSec" class="hide"><span class="label">6. Chọn người (vay/nợ)</span><div id="peopleBox" class="row"></div></section>
-    <section><label class="label" for="note">7. Ghi chú</label><input id="note" class="field" type="text" autocomplete="off"></section>
+    <section id="subSec" class="hide"><span class="label">5. Gợi ý mục con</span><div id="subBox" class="row"></div><span id="subHint" class="cap"></span></section>
+    <section id="peopleSec" class="hide"><span class="label">6. Người liên quan (nếu có)</span><div id="peopleBox" class="row"></div></section>
+    <section><label class="label" for="note">7. Ghi chú (nếu có)</label><input id="note" class="field" type="text" autocomplete="off"></section>
     <section class="card">
       <label class="label" for="money">8. Số tiền · nhập cuối cùng</label>
       <div class="money"><input id="money" type="text" inputmode="numeric" placeholder="0" autocomplete="off"><span>đ</span></div>
@@ -155,6 +153,10 @@ footer .in{max-width:480px;margin:0 auto}
 
   <!-- TAB TRA CỨU -->
   <div id="view-lookup" class="hide">
+    <section>
+      <label class="label" for="lookupDate">Ngày tra cứu</label>
+      <input id="lookupDate" class="field" type="date" aria-label="Ngày tra cứu">
+    </section>
     <div class="sum">
       <div class="card"><div class="mv" role="group" aria-label="Chi" style="color:var(--chi)"><i aria-hidden="true">▼</i><b id="sumChi">0đ</b></div><span class="cap" id="cntChi"></span></div>
       <div class="card"><div class="mv" role="group" aria-label="Thu" style="color:var(--thu)"><i aria-hidden="true">▲</i><b id="sumThu">0đ</b></div><span class="cap" id="cntThu"></span></div>
@@ -215,7 +217,7 @@ footer .in{max-width:480px;margin:0 auto}
 
 <script>
 /* ===== API_URL nằm trong file config.js (sửa một lần, không bị mất khi thay index.html) ===== */
-const APP_VERSION = 'v9';
+const APP_VERSION = 'v10';
 const API_URL = (window.APP_CONFIG && window.APP_CONFIG.API_URL) || '';
 const SEP = '.';            // dấu phân cách hàng nghìn: '.' (khớp sheet) hoặc ','
 const TZ = 'Asia/Ho_Chi_Minh';
@@ -235,8 +237,8 @@ const todayStr = () => new Date().toLocaleDateString('en-CA', { timeZone: TZ });
 const uniq = a => a.filter((v, i) => a.indexOf(v) === i);
 
 const state = {
-  type: 'Chi', source: '', menu: '', sub: '', amount: 0, date: todayStr(),
-  categories: [], people: [], loaded: false,
+  type: 'Chi', source: '', menu: '', sub: '', person: '', amount: 0, date: todayStr(),
+  categories: [], people: [], history: [], loaded: false,
 };
 
 /* ---------- GỌI API ---------- */
@@ -283,15 +285,25 @@ function rows() {
   const byType = state.categories.filter(r => !r.type || r.type.toLowerCase() === state.type.toLowerCase());
   return byType.length ? byType : state.categories;   // nếu sheet Danh mục không chia theo Chi/Thu
 }
+const normKey = v => String(v || '').trim().toLocaleLowerCase('vi');
+const same = (a, b) => normKey(a) === normKey(b);
 const sources = () => uniq(rows().map(r => r.source).filter(Boolean));
-const menus = () => uniq(rows().filter(r => r.source === state.source).map(r => r.menu).filter(Boolean));
-const subs = () => uniq(rows().filter(r => r.source === state.source && r.menu === state.menu).map(r => r.sub).filter(Boolean));
+const menus = () => uniq(rows().filter(r => same(r.source, state.source)).map(r => r.menu).filter(Boolean));
+const categorySubs = () => uniq(rows().filter(r => same(r.source, state.source) && same(r.menu, state.menu)).map(r => r.sub).filter(Boolean));
+const historyGroup = () => (state.history || []).find(g =>
+  same(g.type, state.type) && same(g.source, state.source) && same(g.menu, state.menu));
+const historySubs = () => {
+  const g = historyGroup();
+  return g ? (g.items || []).map(x => x.value).filter(Boolean) : [];
+};
+const subs = () => uniq(categorySubs().concat(historySubs()));
 
 function fixSelection() {
   const s = sources();
-  if (!s.includes(state.source)) state.source = s.includes('Mặc định') ? 'Mặc định' : (s[0] || '');
-  if (!menus().includes(state.menu)) state.menu = '';
-  if (!subs().includes(state.sub)) state.sub = '';
+  if (!s.some(v => same(v, state.source))) state.source = s.find(v => same(v, 'Mặc định')) || (s[0] || '');
+  if (!menus().some(v => same(v, state.menu))) state.menu = '';
+  if (!subs().some(v => same(v, state.sub))) state.sub = '';
+  if (state.menu && !historyGroup()) state.person = '';
 }
 
 /* ---------- VẼ CÁC NHÓM LỰA CHỌN ---------- */
@@ -305,15 +317,22 @@ function renderChoices() {
     `<button type="button" class="tile ${v === state.menu ? 'on' : ''}" data-pick="menu" data-v="${esc(v)}"><i style="background:${DOTS[i % DOTS.length]}"></i>${esc(v)}</button>`).join('')}</div>`
     : '<span class="muted">Chọn nguồn tiền để xem danh mục</span>';
 
-  const sb = subs();
+  const definedSubs = categorySubs();
+  const historicalSubs = historySubs();
+  const sb = uniq(definedSubs.concat(historicalSubs));
   $('subSec').classList.toggle('hide', !sb.length);
-  $('subBox').innerHTML = sb.map(v =>
-    `<button type="button" class="chip ${v === state.sub ? 'on' : ''}" data-pick="sub" data-v="${esc(v)}">${esc(v)}</button>`).join('');
+  $('subBox').innerHTML = sb.map(v => {
+    const fromHistory = historicalSubs.some(h => same(h, v)) && !definedSubs.some(d => same(d, v));
+    return `<button type="button" class="chip ${same(v, state.sub) ? 'on' : ''}" data-pick="sub" data-v="${esc(v)}">${esc(v)}${fromHistory ? ' ↺' : ''}</button>`;
+  }).join('');
+  $('subHint').textContent = historicalSubs.length
+    ? 'Gợi ý có cả mục con trong Danh mục và nội dung từng ghi trong DATA (↺).'
+    : (definedSubs.length ? 'Gợi ý lấy từ sheet Danh mục.' : '');
 
   const showPeople = /vay|nợ/i.test(state.menu) && state.people.length;
   $('peopleSec').classList.toggle('hide', !showPeople);
   $('peopleBox').innerHTML = showPeople ? state.people.map(v =>
-    `<button type="button" class="chip" data-pick="person" data-v="${esc(v)}">${esc(v)}</button>`).join('') : '';
+    `<button type="button" class="chip ${same(v, state.person) ? 'on' : ''}" data-pick="person" data-v="${esc(v)}">${esc(v)}</button>`).join('') : '';
 }
 
 function syncType() {
@@ -328,11 +347,11 @@ document.addEventListener('click', e => {
   const b = e.target.closest('[data-pick]');
   if (!b) return;
   const k = b.dataset.pick, v = b.dataset.v;
-  if (k === 'type') { state.type = v; fixSelection(); syncType(); renderChoices(); }
-  else if (k === 'source') { state.source = v; state.menu = ''; state.sub = ''; renderChoices(); }
-  else if (k === 'menu') { state.menu = v; state.sub = ''; renderChoices(); }
-  else if (k === 'sub') { state.sub = state.sub === v ? '' : v; renderChoices(); }
-  else if (k === 'person') { $('note').value = v; }
+  if (k === 'type') { state.type = v; state.menu = ''; state.sub = ''; state.person = ''; fixSelection(); syncType(); renderChoices(); }
+  else if (k === 'source') { state.source = v; state.menu = ''; state.sub = ''; state.person = ''; renderChoices(); }
+  else if (k === 'menu') { state.menu = v; state.sub = ''; state.person = ''; renderChoices(); }
+  else if (k === 'sub') { state.sub = same(state.sub, v) ? '' : v; renderChoices(); }
+  else if (k === 'person') { state.person = same(state.person, v) ? '' : v; renderChoices(); }
   else if (k === 'quick') { setAmount(state.amount + Number(v)); }
   else if (k === 'retry') { syncQueue(); }
   else if (k === 'ctype') { chart.type = v; loadChart(); }
@@ -345,11 +364,13 @@ function setAmount(n) { state.amount = n; $('money').value = n ? fmt(n) : ''; }
 $('money').addEventListener('input', e => setAmount(Number(e.target.value.replace(/\D/g, '')) || 0));
 $('date').addEventListener('change', e => { state.date = e.target.value || todayStr(); loadDay(); });
 $('date').value = state.date;
+$('lookupDate').value = state.date;
+$('lookupDate').addEventListener('change', e => { state.date = e.target.value || todayStr(); $('date').value = state.date; loadDay(); });
 
 function showTab(name) {
   ['form', 'lookup', 'month', 'chart', 'credit'].forEach(v => $('view-' + v).classList.toggle('hide', v !== name));
   $('saveBar').classList.toggle('hide', name !== 'form');
-  $('date').classList.toggle('hide', name !== 'form' && name !== 'lookup');
+  if (name === 'lookup') $('lookupDate').value = state.date;
   document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === name));
   if (name === 'lookup') loadDay();
   if (name === 'month') loadMonth();
@@ -374,12 +395,14 @@ function renderPending() {
 
 async function syncQueue() {
   if (syncing) return;
+  let savedAny = false;
   syncing = true; renderPending();
   try {
     while (getQ().length) {
       const item = getQ()[0];
       try {
         await api('add', item);
+        savedAny = true;
         const q = getQ(); q.shift(); setQ(q);
       } catch (err) {
         if (err.net) break;                       // mất mạng: giữ lại, thử lại sau
@@ -390,6 +413,9 @@ async function syncQueue() {
     }
   } finally {
     syncing = false; renderPending();
+    if (savedAny && !getQ().length) {
+      try { const m = await api('meta'); applyMeta(m); localStorage.setItem('meta_v1', JSON.stringify(m)); } catch (e) {}
+    }
     refreshActive();
   }
 }
@@ -400,12 +426,12 @@ $('saveBtn').addEventListener('click', () => {
   if (!state.menu) return toast('Chọn danh mục');
   const item = {
     cid: newCid(), type: state.type, date: state.date, source: state.source, menu: state.menu,
-    sub: state.sub, note: $('note').value, money: state.amount,
+    sub: state.sub, note: $('note').value, person: state.person, money: state.amount,
   };
   const q = getQ(); q.push(item); setQ(q);          // lưu vào máy trước, không mất dù đóng app
   haptic('success');
   toast('Đã ghi ' + fmt(item.money) + 'đ');
-  setAmount(0); $('note').value = ''; state.menu = ''; state.sub = ''; renderChoices();
+  setAmount(0); $('note').value = ''; state.menu = ''; state.sub = ''; state.person = ''; renderChoices();
   syncQueue();                                       // gửi lên sheet chạy ngầm
 });
 
@@ -422,7 +448,7 @@ async function loadDay() {
     $('dayList').innerHTML = d.items.length ? d.items.map(it => `
       <div class="item">
         <div><div>${esc(it.menu)}${it.sub ? ' · ' + esc(it.sub) : ''}</div>
-        <small>${esc(it.note || it.source)}</small></div>
+        <small>${esc(it.source)}${it.person ? ' · ' + esc(it.person) : ''}${it.note ? ' · ' + esc(it.note) : ''}</small></div>
         <div class="amt" style="color:var(--${it.type === 'Thu' ? 'thu' : 'chi'})">${it.type === 'Thu' ? '+' : '-'}${fmt(it.money)}đ</div>
       </div>`).join('') : '<span class="muted">Ngày này chưa có giao dịch nào.</span>';
   } catch (err) {
@@ -464,7 +490,7 @@ function renderBalance(b) {
   const bal = b.thu - b.chi;
   const el = $('balBand');
   el.classList.remove('hide');
-  el.innerHTML = `<div class="bal"><span class="bl">Chênh lệch thu–chi</span><b class="bn">${bal < 0 ? '-' : ''}${fmt(Math.abs(bal))}đ</b></div>` +
+  el.innerHTML = `<div class="bal"><span class="bl">Còn lại</span><b class="bn">${bal < 0 ? '-' : ''}${fmt(Math.abs(bal))}đ</b></div>` +
     `<div class="tc"><span class="in" title="Thu" aria-label="Thu ${fmt(b.thu)} đồng"><i aria-hidden="true">▲</i>${fmt(b.thu)}đ</span>` +
     `<span class="out" title="Chi" aria-label="Chi ${fmt(b.chi)} đồng"><i aria-hidden="true">▼</i>${fmt(b.chi)}đ</span></div>`;
 }
@@ -607,7 +633,7 @@ async function loadCredit() {
 
 /* ---------- KHỞI ĐỘNG ---------- */
 function applyMeta(m) {
-  state.categories = m.categories; state.people = m.people; state.loaded = true;
+  state.categories = m.categories || []; state.people = m.people || []; state.history = m.history || []; state.loaded = true;
   fixSelection(); renderChoices();
 }
 
@@ -626,7 +652,7 @@ async function init() {
   syncQueue();   // gửi nốt các giao dịch còn chờ từ lần trước
   try {
     const m = await api('meta');
-    try { localStorage.setItem('meta_v1', JSON.stringify({ categories: m.categories, people: m.people })); } catch (e) {}
+    try { localStorage.setItem('meta_v1', JSON.stringify(m)); } catch (e) {}
     applyMeta(m);
   } catch (err) {
     if (!state.loaded) $('menuBox').innerHTML = '<span class="err">Không tải được danh mục: ' + esc(err.message) + '</span>';
