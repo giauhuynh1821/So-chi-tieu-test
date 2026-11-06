@@ -107,7 +107,10 @@ footer .in{max-width:480px;margin:0 auto}
 <body>
 <div id="app">
   <header>
-    <h1>Sổ chi tiêu</h1>
+    <div>
+      <h1>Sổ chi tiêu</h1>
+      <span class="cap">Ngày giao dịch</span>
+    </div>
     <input id="date" class="pill" type="date" aria-label="Ngày giao dịch">
   </header>
 
@@ -125,18 +128,21 @@ footer .in{max-width:480px;margin:0 auto}
 
   <!-- TAB GHI CHÉP -->
   <div id="view-form">
-    <div class="seg" role="group" aria-label="Loại giao dịch">
-      <button type="button" data-pick="type" data-v="Chi" class="on">Chi</button>
-      <button type="button" data-pick="type" data-v="Thu">Thu</button>
-    </div>
+    <section>
+      <span class="label">2. Loại giao dịch</span>
+      <div class="seg" role="group" aria-label="Loại giao dịch">
+        <button type="button" data-pick="type" data-v="Chi" class="on">Chi</button>
+        <button type="button" data-pick="type" data-v="Thu">Thu</button>
+      </div>
+    </section>
 
-    <section><span class="label">Nguồn tiền</span><div id="srcBox" class="row"></div></section>
-    <section><span class="label">Danh mục</span><div id="menuBox"><span class="muted">Đang tải danh mục...</span></div></section>
-    <section id="subSec" class="hide"><span class="label">Mục con · theo danh mục đã chọn</span><div id="subBox" class="row"></div></section>
-    <section id="peopleSec" class="hide"><span class="label">Chọn người (vay/nợ)</span><div id="peopleBox" class="row"></div></section>
-    <section><label class="label" for="note">Ghi chú</label><input id="note" class="field" type="text" autocomplete="off"></section>
+    <section><span class="label">3. Nguồn tiền</span><div id="srcBox" class="row"></div></section>
+    <section><span class="label">4. Danh mục</span><div id="menuBox"><span class="muted">Đang tải danh mục...</span></div></section>
+    <section id="subSec" class="hide"><span class="label">5. Mục con · theo danh mục đã chọn</span><div id="subBox" class="row"></div></section>
+    <section id="peopleSec" class="hide"><span class="label">6. Chọn người (vay/nợ)</span><div id="peopleBox" class="row"></div></section>
+    <section><label class="label" for="note">7. Ghi chú</label><input id="note" class="field" type="text" autocomplete="off"></section>
     <section class="card">
-      <label class="label" for="money">Số tiền</label>
+      <label class="label" for="money">8. Số tiền · nhập cuối cùng</label>
       <div class="money"><input id="money" type="text" inputmode="numeric" placeholder="0" autocomplete="off"><span>đ</span></div>
       <div class="row" style="margin-top:10px">
         <button type="button" class="chip" data-pick="quick" data-v="10000">+10.000</button>
@@ -209,7 +215,7 @@ footer .in{max-width:480px;margin:0 auto}
 
 <script>
 /* ===== API_URL nằm trong file config.js (sửa một lần, không bị mất khi thay index.html) ===== */
-const APP_VERSION = 'v8';
+const APP_VERSION = 'v9';
 const API_URL = (window.APP_CONFIG && window.APP_CONFIG.API_URL) || '';
 const SEP = '.';            // dấu phân cách hàng nghìn: '.' (khớp sheet) hoặc ','
 const TZ = 'Asia/Ho_Chi_Minh';
@@ -458,7 +464,7 @@ function renderBalance(b) {
   const bal = b.thu - b.chi;
   const el = $('balBand');
   el.classList.remove('hide');
-  el.innerHTML = `<div class="bal"><span class="bl">Còn lại</span><b class="bn">${bal < 0 ? '-' : ''}${fmt(Math.abs(bal))}đ</b></div>` +
+  el.innerHTML = `<div class="bal"><span class="bl">Chênh lệch thu–chi</span><b class="bn">${bal < 0 ? '-' : ''}${fmt(Math.abs(bal))}đ</b></div>` +
     `<div class="tc"><span class="in" title="Thu" aria-label="Thu ${fmt(b.thu)} đồng"><i aria-hidden="true">▲</i>${fmt(b.thu)}đ</span>` +
     `<span class="out" title="Chi" aria-label="Chi ${fmt(b.chi)} đồng"><i aria-hidden="true">▼</i>${fmt(b.chi)}đ</span></div>`;
 }
