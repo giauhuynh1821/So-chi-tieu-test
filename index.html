@@ -217,7 +217,7 @@ footer .in{max-width:480px;margin:0 auto}
 
 <script>
 /* ===== API_URL nằm trong file config.js (sửa một lần, không bị mất khi thay index.html) ===== */
-const APP_VERSION = 'v10';
+const APP_VERSION = 'v11';
 const API_URL = (window.APP_CONFIG && window.APP_CONFIG.API_URL) || '';
 const SEP = '.';            // dấu phân cách hàng nghìn: '.' (khớp sheet) hoặc ','
 const TZ = 'Asia/Ho_Chi_Minh';
@@ -230,7 +230,7 @@ const dark = tg ? tg.colorScheme === 'dark' : window.matchMedia('(prefers-color-
 if (dark) root.dataset.theme = 'dark';
 
 const $ = id => document.getElementById(id);
-$('appVer').textContent = APP_VERSION;
+$('appVer').textContent = 'Mini App ' + APP_VERSION + ' · API đang kết nối…';
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const fmt = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, SEP);
 const todayStr = () => new Date().toLocaleDateString('en-CA', { timeZone: TZ });
