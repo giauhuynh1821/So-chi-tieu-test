@@ -217,7 +217,7 @@ footer .in{max-width:480px;margin:0 auto}
 
 <script>
 /* ===== API_URL nằm trong file config.js (sửa một lần, không bị mất khi thay index.html) ===== */
-const APP_VERSION = 'v13';
+const APP_VERSION = 'v15';
 const API_URL = (window.APP_CONFIG && window.APP_CONFIG.API_URL) || '';
 const SEP = '.';            // dấu phân cách hàng nghìn: '.' (khớp sheet) hoặc ','
 const TZ = 'Asia/Ho_Chi_Minh';
@@ -460,7 +460,7 @@ async function loadDay() {
         <small>${esc(it.source)}${it.person ? ' · ' + esc(it.person) : ''}${it.note ? ' · ' + esc(it.note) : ''}</small></div>
         <div class="amt" style="color:var(--${it.type === 'Thu' ? 'thu' : 'chi'})">${it.type === 'Thu' ? '+' : '-'}${fmt(amount)}đ</div>
       </div>`;
-    }).join('') : '<span class="muted">Ngày này chưa có giao dịch nào.</span>';
+    }).join('') : '<span class="muted">Ngày này chưa có giao dịch nào.' + latestNote(d.lastDate) + '</span>';
   } catch (err) {
     $('dayList').innerHTML = '<span class="err">Lỗi: ' + esc(err.message) + '</span>';
   }
@@ -487,7 +487,9 @@ async function loadMonth() {
       const key = d.year + '-' + mm + '-' + String(x.d).padStart(2, '0');
       return `<tr data-pick="gotoday" data-v="${key}" class="${key === today ? 'today' : ''}"><td>${x.d}</td>${val(x.chi, 'c-chi')}${val(x.thu, 'c-thu')}</tr>`;
     }).join('');
-    $('monthTable').innerHTML = `<table class="tbl"><thead><tr><th>Ngày</th><th class="r">Chi</th><th class="r">Thu</th></tr></thead>
+    const emptyNote = (d.totalChi === 0 && d.totalThu === 0)
+      ? `<p class="cap" style="margin:6px 4px 10px">Chưa có giao dịch nào trong tháng ${d.month}/${d.year}.${latestNote(d.lastDate)}</p>` : '';
+    $('monthTable').innerHTML = emptyNote + `<table class="tbl"><thead><tr><th>Ngày</th><th class="r">Chi</th><th class="r">Thu</th></tr></thead>
       <tbody>${body}</tbody>
       <tfoot><tr class="total"><td>Tổng</td><td class="r c-chi">${fmt(d.totalChi)}</td><td class="r c-thu">${fmt(d.totalThu)}</td></tr></tfoot></table>`;
   } catch (err) {
@@ -530,6 +532,7 @@ const toUTC = k => { const [y, m, d] = k.split('-').map(Number); return new Date
 const dkey = dt => dt.getUTCFullYear() + '-' + pad2(dt.getUTCMonth() + 1) + '-' + pad2(dt.getUTCDate());
 const addDays = (k, n) => dkey(new Date(toUTC(k).getTime() + n * 864e5));
 const fmtDM = k => k.slice(8, 10) + '/' + k.slice(5, 7);
+const latestNote = k => k ? ' Giao dịch mới nhất trong sheet: ' + k.slice(8, 10) + '/' + k.slice(5, 7) + '/' + k.slice(0, 4) + '.' : '';
 const fmtDMY = k => k.slice(8, 10) + '/' + k.slice(5, 7) + '/' + k.slice(0, 4);
 
 function chartRange() {
@@ -622,7 +625,9 @@ async function loadCredit() {
     $('crStSub').textContent = st ? left(st) + ' · hằng tháng ngày ' + d.statementDay : 'Chưa đọc được trong sheet';
     $('crDue').textContent = du ? fmtDMY(du.date) : (d.dueRaw || '–');
     $('crDue').style.color = du && du.daysLeft <= 3 ? 'var(--danger)' : '';
-    $('crDueSub').textContent = du ? left(du) + ' · hằng tháng ngày ' + d.dueDay : 'Chưa đọc được trong sheet';
+    $('crDueSub').textContent = du
+      ? left(du) + (d.dueOffsetDays != null ? ' · ' + d.dueOffsetDays + ' ngày sau ngày sao kê' : ' · hằng tháng ngày ' + d.dueDay)
+      : 'Chưa đọc được trong sheet';
 
     $('crCycle').innerHTML = d.cycle
       ? `<span class="label" style="margin-bottom:4px">Kỳ sao kê hiện tại · ${fmtDMY(d.cycle.from)} – ${fmtDMY(d.cycle.to)}</span>
