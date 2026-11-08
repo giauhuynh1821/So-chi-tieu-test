@@ -217,7 +217,7 @@ footer .in{max-width:480px;margin:0 auto}
 
 <script>
 /* ===== API_URL nằm trong file config.js (sửa một lần, không bị mất khi thay index.html) ===== */
-const APP_VERSION = 'v15';
+const APP_VERSION = 'v16';
 const API_URL = (window.APP_CONFIG && window.APP_CONFIG.API_URL) || '';
 const SEP = '.';            // dấu phân cách hàng nghìn: '.' (khớp sheet) hoặc ','
 const TZ = 'Asia/Ho_Chi_Minh';
@@ -248,7 +248,7 @@ const state = {
 
 /* ---------- GỌI API ---------- */
 async function api(action, payload) {
-  const fail = (msg) => { const er = new Error(msg); er.net = true; return er; };  // lỗi cấu hình/mạng: giữ lại để gửi sau
+  const fail = (msg) => { const er = new Error(msg); er.net = true; $('appVer').textContent = 'Mini App ' + APP_VERSION + ' · không gọi được API'; return er; };  // lỗi cấu hình/mạng: giữ lại để gửi sau
   if (!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(API_URL)) {
     throw fail('API_URL trong file config.js chưa đúng (phải dạng https://script.google.com/macros/s/.../exec)');
   }
@@ -275,7 +275,8 @@ async function api(action, payload) {
 function showVer(apiV) {
   const tail = API_URL.replace(/\/exec$/, '').slice(-6);
   // Chỉ hiện số phiên bản app; thông tin API chỉ xem khi rê chuột/nhấn giữ
-  $('appVer').title = APP_VERSION + ' · ' + (apiV || 'API cũ') + ' · …' + tail;
+  $('appVer').textContent = 'Mini App ' + APP_VERSION + ' · ' + (apiV || 'API cũ (chưa có số phiên bản)');
+  $('appVer').title = 'Đuôi link API: …' + tail;
 }
 
 let toastTimer;
