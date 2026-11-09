@@ -24,15 +24,22 @@
 html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font-family:'Be Vietnam Pro',system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
 button,input{font-family:inherit;color:inherit}
-#app{max-width:480px;margin:0 auto;padding:16px 16px 120px}
+#app{max-width:480px;margin:0 auto;padding:16px 16px calc(170px + env(safe-area-inset-bottom))}
 header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 h1{margin:0;font-size:22px;font-weight:700}
+header .exit-form{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:8px 12px;font-size:14px;font-weight:600;cursor:pointer}
+header .exit-form.hide{display:none}
+
 .pill{height:36px;padding:0 14px;border-radius:18px;background:var(--card);border:1px solid var(--line);font-size:13px;font-weight:500}
 input[type=date].pill,input[type=month].pill{width:auto}
 .seg{display:flex;padding:4px;background:var(--seg);border-radius:16px;gap:4px;margin-bottom:16px}
 .seg button{flex:1;height:44px;border:0;border-radius:12px;background:transparent;color:var(--muted);font-size:15px;font-weight:600;cursor:pointer}
 .seg button.on{background:var(--accent);color:var(--on-accent)}
 .seg.tabs button.on,.seg.plain button.on{background:var(--card);color:var(--ink)}
+#bottomTabs{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(100%,480px);z-index:30;margin:0;padding:7px 8px calc(7px + env(safe-area-inset-bottom));border-radius:18px 18px 0 0;background:var(--seg);box-shadow:0 -5px 18px rgba(0,0,0,.22);gap:2px}
+#bottomTabs button{height:50px;min-width:0;padding:0 2px;font-size:clamp(10px,3.1vw,14px);white-space:nowrap}
+#bottomTabs.hide{display:none}
+
 section{margin-bottom:16px}
 .label{display:block;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
 .card{background:var(--card);border-radius:20px;padding:18px 20px}
@@ -49,14 +56,23 @@ section{margin-bottom:16px}
 .field{width:100%;height:52px;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:0 16px;font-size:15px;outline:none}
 footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom))}
 footer .in{max-width:480px;margin:0 auto}
+footer .in.actions{display:flex;gap:10px}
+footer .actions .save{flex:1;width:auto}
+.cancel{flex:0 0 34%;height:56px;border:1px solid var(--line);border-radius:16px;background:var(--seg);color:var(--ink);font-size:16px;font-weight:700;cursor:pointer}
+
 .save{width:100%;height:56px;border:0;border-radius:16px;background:var(--accent);color:var(--on-accent);font-size:16px;font-weight:700;cursor:pointer}
 .save:disabled{opacity:.6}
 .sum{display:flex;gap:12px;margin-bottom:16px}
-.sum .card{flex:1;padding:14px 16px}
-.sum b{display:block;font-size:20px;margin-top:4px}
+.sum .card{flex:1;padding:10px 12px}
+.sum b{display:block;font-size:17px;margin-top:3px}
+.sum .mv b{font-size:18px;margin-top:0}
+.sum .mv{display:flex;align-items:center;gap:5px;white-space:nowrap}
+.sum.three .mv b{font-size:13px}
+.sum.three .card{padding:9px 10px}
+.sum.three b{font-size:13px;margin-top:3px;white-space:nowrap}
 .item{display:flex;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
 .item:last-child{border-bottom:0}
-.item small{display:block;color:var(--muted);margin-top:2px;font-size:13px}
+.item small{display:block;color:var(--muted);margin-top:2px;font-size:11px;font-style:italic;line-height:1.35}
 .amt{font-weight:700;white-space:nowrap}
 .muted{color:var(--muted);font-size:14px}
 .err{color:var(--danger);font-size:14px}
@@ -78,21 +94,48 @@ footer .in{max-width:480px;margin:0 auto}
 .card.tight{padding:8px 14px}
 .seg.tabs{overflow:hidden}
 .seg.tabs button{flex:1 1 0;min-width:0;padding:0 2px;font-size:13px;white-space:nowrap}
+.tab-add{display:inline-flex;align-items:center;justify-content:center;margin-left:3px;width:17px;height:17px;border-radius:50%;background:var(--line);color:var(--ink);font-size:14px;font-weight:700;line-height:1;vertical-align:middle;cursor:pointer}
+.tab-add:active{transform:scale(.92)}
+.fab-add{position:fixed;right:max(18px,calc((100vw - 480px)/2 + 18px));bottom:calc(88px + env(safe-area-inset-bottom));z-index:20;width:54px;height:54px;border:0;border-radius:50%;background:var(--accent);color:var(--on-accent);font-size:32px;font-weight:500;line-height:1;box-shadow:0 6px 18px rgba(0,0,0,.28);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.fab-add:active{transform:scale(.94)}
+.fab-add.hide{display:none}
 .seg.small button{height:36px;font-size:13px;border-radius:10px}
 .band{background:var(--card);border-radius:20px;padding:14px 18px;margin-bottom:16px;display:flex;flex-direction:column;gap:6px}
-.band .bal{display:flex;align-items:baseline;gap:10px}
-.band .bl{font-size:14px;font-weight:500;color:var(--muted)}
-.band .bn{font-size:28px;font-weight:700;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
-.band .tc{display:flex;gap:22px;font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}
-.band .tc i{font-style:normal;font-size:10px;margin-right:6px}
+.band .bal{display:flex;align-items:center;gap:8px}
+.band .bl{font-size:0;color:var(--muted)}
+.band .bn{font-size:29px;font-weight:700;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.band .tc{display:flex;gap:18px;font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}
+.band .tc i{font-style:normal;font-size:15px;margin-right:5px}
+.band .bal .bl:before{content:'◈';font-size:21px}
 .band .in{color:var(--thu)}
 .band .out{color:var(--chi)}
-.sum.three b{font-size:15px}
+.sum.three b{font-size:15px}.sum.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%;min-width:0}
+.sum.three .card{min-width:0;max-width:100%;overflow:hidden;padding:9px 6px}
+.sum.three .mv{display:flex;align-items:center;justify-content:center;gap:3px;min-width:0;white-space:nowrap}
+.sum.three .mv i{flex:0 0 auto;font-size:11px}
+.sum.three .mv b{display:inline-block;min-width:0;font-size:clamp(10px,2.8vw,13px)!important;letter-spacing:-.035em;white-space:nowrap}
+#view-month{min-width:0;overflow:hidden}
+#view-month .label{font-size:11px;line-height:1.35;letter-spacing:.02em;margin:2px 0 10px}
+
 .cap{display:block;font-size:11px;line-height:1.35;color:var(--muted);margin-top:2px}
 .sum .mv{display:flex;align-items:baseline;gap:6px}
 .sum .mv i{font-style:normal;font-size:12px}
 .sum .mv b{font-size:22px;margin-top:0}
-#crSt,#crDue{font-size:18px}
+.sum:not(.three) .mv b{font-size:18px}
+#crSt,#crDue{font-size:16px}
+.credit-sub{font-size:10px;line-height:1.3;font-style:italic}
+.credit-cycle-label{display:block;font-size:11px;line-height:1.35;color:var(--muted);font-weight:600;text-transform:uppercase;margin-bottom:3px}
+.credit-cycle-dates{font-size:11px;line-height:1.4;color:var(--muted);margin-bottom:6px;font-style:italic}
+.credit-cycle-amount{font-size:18px!important}
+.excluded-note{margin:6px 4px 10px;font-size:11px;line-height:1.4;font-style:italic;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.excluded-count{color:#F59E0B}
+.excluded-count span{font-style:normal;margin-right:3px}
+.excluded-values{display:flex;align-items:center;gap:16px}
+.excluded-values i{font-style:normal;margin-right:4px}
+.excluded-out{color:var(--chi)}
+.excluded-in{color:var(--thu)}
+.credit-cycle-count{font-size:10px;font-style:italic}
+/* Mục con được ẩn/hiện theo dữ liệu danh mục trong renderChoices() */
 .nav{display:flex;align-items:center;justify-content:space-between;margin:4px 0 12px}
 .nav button{width:44px;height:44px;border-radius:22px;border:1px solid var(--line);background:var(--card);font-size:20px;cursor:pointer}
 .nav span{font-weight:600;font-size:15px}
@@ -114,16 +157,16 @@ footer .in{max-width:480px;margin:0 auto}
 
   <div id="pendingBar" class="pendingbar hide" role="status"></div>
 
-  <div class="seg tabs" role="group" aria-label="Chuyển tab">
-    <button type="button" class="on" data-tab="form">Ghi chép</button>
-    <button type="button" data-tab="lookup">Tra cứu</button>
+  <div id="bottomTabs" class="seg tabs" role="group" aria-label="Chuyển tab">
+    <button type="button" data-tab="form">Ghi chép</button>
+    <button type="button" class="on" data-tab="lookup">Tra cứu</button>
     <button type="button" data-tab="month">Tháng</button>
     <button type="button" data-tab="chart">Biểu đồ</button>
     <button type="button" data-tab="credit">Tín dụng</button>
   </div>
 
   <!-- TAB GHI CHÉP -->
-  <div id="view-form">
+  <div id="view-form" class="hide">
     <section>
       <label class="label" for="date">1. Ngày giao dịch</label>
       <input id="date" class="field" type="date" aria-label="Ngày giao dịch">
@@ -152,14 +195,14 @@ footer .in{max-width:480px;margin:0 auto}
   </div>
 
   <!-- TAB TRA CỨU -->
-  <div id="view-lookup" class="hide">
+  <div id="view-lookup">
     <section>
       <label class="label" for="lookupDate">Ngày tra cứu</label>
       <input id="lookupDate" class="field" type="date" aria-label="Ngày tra cứu">
     </section>
     <div class="sum">
-      <div class="card"><div class="mv" role="group" aria-label="Chi" style="color:var(--chi)"><i aria-hidden="true">▼</i><b id="sumChi">0đ</b></div><span class="cap" id="cntChi"></span></div>
-      <div class="card"><div class="mv" role="group" aria-label="Thu" style="color:var(--thu)"><i aria-hidden="true">▲</i><b id="sumThu">0đ</b></div><span class="cap" id="cntThu"></span></div>
+      <div class="card"><div class="mv" role="group" aria-label="Chi" style="color:var(--chi)"><i aria-hidden="true">↓</i><b id="sumChi">0đ</b></div><span class="cap" id="cntChi"></span></div>
+      <div class="card"><div class="mv" role="group" aria-label="Thu" style="color:var(--thu)"><i aria-hidden="true">↑</i><b id="sumThu">0đ</b></div><span class="cap" id="cntThu"></span></div>
     </div>
     <div class="card" id="dayList"><span class="muted">Đang tải...</span></div>
   </div>
@@ -168,11 +211,11 @@ footer .in{max-width:480px;margin:0 auto}
   <div id="view-month" class="hide">
     <div style="margin-bottom:12px"><input id="monthPick" class="pill" type="month" aria-label="Chọn tháng"></div>
     <div class="sum three">
-      <div class="card"><span class="label" style="margin:0">Chi</span><b id="sumMChi" style="color:var(--chi)">0đ</b></div>
-      <div class="card"><span class="label" style="margin:0">Thu</span><b id="sumMThu" style="color:var(--thu)">0đ</b></div>
-      <div class="card"><span class="label" style="margin:0">Còn lại</span><b id="sumMBal">0đ</b></div>
+      <div class="card"><div class="mv" style="color:var(--chi)"><i aria-hidden="true">▼</i><b id="sumMChi">0đ</b></div></div>
+      <div class="card"><div class="mv" style="color:var(--thu)"><i aria-hidden="true">▲</i><b id="sumMThu">0đ</b></div></div>
+      <div class="card"><div class="mv"><i aria-hidden="true">◈</i><b id="sumMBal">0đ</b></div></div>
     </div>
-    <span class="label">Thu chi theo ngày · bấm một ngày để xem chi tiết</span>
+    <span class="label">Thu chi theo ngày</span>
     <div class="card tight" id="monthTable"><span class="muted">Đang tải...</span></div>
   </div>
 
@@ -212,12 +255,13 @@ footer .in{max-width:480px;margin:0 auto}
   <div id="appVer" class="appver"></div>
 </div>
 
-<footer id="saveBar"><div class="in"><button id="saveBtn" class="save" type="button">Lưu giao dịch</button></div></footer>
+<footer id="saveBar" class="hide"><div class="in actions"><button id="cancelBtn" class="cancel" type="button">Hủy</button><button id="saveBtn" class="save" type="button">Lưu giao dịch</button></div></footer>
+<button id="fabAdd" class="fab-add" type="button" aria-label="Thêm giao dịch" title="Thêm giao dịch">+</button>
 <div id="toast" role="status"></div>
 
 <script>
 /* ===== API_URL nằm trong file config.js (sửa một lần, không bị mất khi thay index.html) ===== */
-const APP_VERSION = 'v18';
+const APP_VERSION = 'v36-demo';
 const API_URL = (window.APP_CONFIG && window.APP_CONFIG.API_URL) || '';
 const SEP = '.';            // dấu phân cách hàng nghìn: '.' (khớp sheet) hoặc ','
 const TZ = 'Asia/Ho_Chi_Minh';
@@ -239,7 +283,16 @@ const moneyNumber = v => {
   return Number.isFinite(n) ? n : 0;
 };
 const todayStr = () => new Date().toLocaleDateString('en-CA', { timeZone: TZ });
-const uniq = a => a.filter((v, i) => a.indexOf(v) === i);
+// Gộp các nhãn trùng nhau dù khác chữ hoa/thường hoặc dấu cách thừa.
+const uniq = a => {
+  const seen = new Set();
+  return a.filter(v => {
+    const key = String(v || '').normalize('NFC').trim().toLocaleLowerCase('vi');
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+};
 
 const state = {
   type: 'Chi', source: '', menu: '', sub: '', person: '', amount: 0, date: todayStr(),
@@ -247,7 +300,37 @@ const state = {
 };
 
 /* ---------- GỌI API ---------- */
+const API_CACHE_PREFIX = 'mini_api_cache_v36:';
+const API_CACHE_TTL = 45 * 1000; // cache 45 giây
+function apiCacheKey(action, payload) {
+  return API_CACHE_PREFIX + action + ':' + JSON.stringify(payload || {});
+}
+function readApiCache(action, payload) {
+  try {
+    const raw = localStorage.getItem(apiCacheKey(action, payload));
+    if (!raw) return null;
+    const item = JSON.parse(raw);
+    if (!item || Date.now() - item.time > API_CACHE_TTL) return null;
+    return item.data;
+  } catch (e) { return null; }
+}
+function writeApiCache(action, payload, data) {
+  try {
+    localStorage.setItem(apiCacheKey(action, payload), JSON.stringify({ time: Date.now(), data }));
+  } catch (e) {}
+}
+function clearApiCache() {
+  try {
+    Object.keys(localStorage).filter(k => k.startsWith(API_CACHE_PREFIX)).forEach(k => localStorage.removeItem(k));
+  } catch (e) {}
+}
+
 async function api(action, payload) {
+  const cacheable = ['day', 'month', 'breakdown', 'credit'].includes(action);
+  if (cacheable) {
+    const cached = readApiCache(action, payload);
+    if (cached) return cached;
+  }
   const fail = (msg) => { const er = new Error(msg); er.net = true; $('appVer').textContent = 'Mini App ' + APP_VERSION + ' · không gọi được API'; return er; };  // lỗi cấu hình/mạng: giữ lại để gửi sau
   if (!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(API_URL)) {
     throw fail('API_URL trong file config.js chưa đúng (phải dạng https://script.google.com/macros/s/.../exec)');
@@ -268,6 +351,8 @@ async function api(action, payload) {
   }
   showVer(data.v);
   if (!data.ok) throw new Error(data.error || 'Lỗi không xác định');
+  if (cacheable) writeApiCache(action, payload, data);
+  if (action === 'add') clearApiCache();
   return data;
 }
 
@@ -323,6 +408,7 @@ function renderChoices() {
     `<button type="button" class="tile ${v === state.menu ? 'on' : ''}" data-pick="menu" data-v="${esc(v)}"><i style="background:${DOTS[i % DOTS.length]}"></i>${esc(v)}</button>`).join('')}</div>`
     : '<span class="muted">Chọn nguồn tiền để xem danh mục</span>';
 
+  // Lấy mục con từ sheet Danh mục; đồng thời giữ gợi ý lịch sử như bản người dùng cung cấp.
   const definedSubs = categorySubs();
   const historicalSubs = historySubs();
   const sb = uniq(definedSubs.concat(historicalSubs));
@@ -347,7 +433,21 @@ function syncType() {
 }
 
 /* ---------- SỰ KIỆN ---------- */
+document.addEventListener('keydown', e => {
+  const addForm = e.target.closest && e.target.closest('[data-add-form]');
+  if (addForm && (e.key === 'Enter' || e.key === ' ')) {
+    e.preventDefault();
+    e.stopPropagation();
+    showTab('form');
+  }
+});
+$('fabAdd').addEventListener('click', openEntryFromCurrentTab);
+$('cancelBtn').addEventListener('click', () => showTab(returnTabAfterSave || 'lookup'));
+
+
 document.addEventListener('click', e => {
+  const addForm = e.target.closest('[data-add-form]');
+  if (addForm) { e.preventDefault(); e.stopPropagation(); showTab('form'); return; }
   const tab = e.target.closest('[data-tab]');
   if (tab) return showTab(tab.dataset.tab);
   const b = e.target.closest('[data-pick]');
@@ -373,9 +473,23 @@ $('date').value = state.date;
 $('lookupDate').value = state.date;
 $('lookupDate').addEventListener('change', e => { state.date = e.target.value || todayStr(); $('date').value = state.date; loadDay(); });
 
+let returnTabAfterSave = 'lookup';
+function openEntryFromCurrentTab() {
+  const current = ['lookup','month','chart','credit'].find(v => !$('view-' + v).classList.contains('hide')) || 'lookup';
+  returnTabAfterSave = current;
+  showTab('form');
+}
+
 function showTab(name) {
+  if (name === 'form' && !$('view-form').classList.contains('hide')) {
+    // Đang ở form thì giữ nguyên tab nguồn đã ghi nhớ.
+  } else if (name === 'form') {
+    returnTabAfterSave = ['lookup','month','chart','credit'].find(v => !$('view-' + v).classList.contains('hide')) || 'lookup';
+  }
   ['form', 'lookup', 'month', 'chart', 'credit'].forEach(v => $('view-' + v).classList.toggle('hide', v !== name));
   $('saveBar').classList.toggle('hide', name !== 'form');
+  $('bottomTabs').classList.toggle('hide', name === 'form');
+  $('fabAdd').classList.toggle('hide', name === 'form');
   if (name === 'lookup') $('lookupDate').value = state.date;
   document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === name));
   if (name === 'lookup') loadDay();
@@ -408,6 +522,7 @@ async function syncQueue() {
       const item = getQ()[0];
       try {
         await api('add', item);
+        clearApiCache();
         savedAny = true;
         const q = getQ(); q.shift(); setQ(q);
       } catch (err) {
@@ -422,13 +537,7 @@ async function syncQueue() {
     if (savedAny && !getQ().length) {
       try { const m = await api('meta'); applyMeta(m); localStorage.setItem('meta_v3', JSON.stringify(m)); } catch (e) {}
     }
-    // Làm mới các tab đang mở và số dư sau khi máy chủ đã xác nhận giao dịch.
-    if (savedAny) {
-      toast('Đã đồng bộ giao dịch lên Google Sheets');
-      refreshActive();
-    } else if (!getQ().length) {
-      refreshActive();
-    }
+    refreshActive();
   }
 }
 
@@ -441,25 +550,12 @@ $('saveBtn').addEventListener('click', () => {
     sub: state.sub, note: $('note').value, person: state.person, money: state.amount,
   };
   const q = getQ(); q.push(item); setQ(q);          // lưu vào máy trước, không mất dù đóng app
-
-  // Cập nhật số dư ngay trên giao diện (optimistic UI) nếu giao dịch thuộc tháng hiện tại.
-  // Sau khi máy chủ lưu xong, refreshActive() sẽ lấy lại số liệu chuẩn từ Google Sheets.
-  try {
-    const currentMonth = todayStr().slice(0, 7);
-    if (item.date.slice(0, 7) === currentMonth) {
-      const cached = JSON.parse(localStorage.getItem('bal_v1') || 'null');
-      if (cached && cached.y + '-' + String(cached.m).padStart(2, '0') === currentMonth) {
-        if (String(item.type).toLowerCase() === 'thu') cached.thu = Number(cached.thu || 0) + Number(item.money);
-        else cached.chi = Number(cached.chi || 0) + Number(item.money);
-        localStorage.setItem('bal_v1', JSON.stringify(cached));
-        renderBalance(cached);
-      }
-    }
-  } catch (e) {}
-
   haptic('success');
-  toast('Đã ghi ' + fmt(item.money) + 'đ · đang đồng bộ');
+  toast('Đã ghi ' + fmt(item.money) + 'đ');
   setAmount(0); $('note').value = ''; state.menu = ''; state.sub = ''; state.person = ''; renderChoices();
+  const returnTab = returnTabAfterSave || 'lookup';
+  returnTabAfterSave = 'lookup';
+  showTab(returnTab);                                // quay về tab đã mở form
   syncQueue();                                       // gửi lên sheet chạy ngầm
 });
 
@@ -512,7 +608,17 @@ async function loadMonth() {
     }).join('');
     const emptyNote = (d.totalChi === 0 && d.totalThu === 0)
       ? `<p class="cap" style="margin:6px 4px 10px">Chưa có giao dịch nào trong tháng ${d.month}/${d.year}.${latestNote(d.lastDate)}</p>` : '';
-    $('monthTable').innerHTML = emptyNote + `<table class="tbl"><thead><tr><th>Ngày</th><th class="r">Chi</th><th class="r">Thu</th></tr></thead>
+    const exNote = d.excludedCount
+      ? `<div class="excluded-note">
+          <div class="excluded-count"><span aria-hidden="true">ⓘ</span> ${d.excludedCount} giao dịch không báo cáo</div>
+          <div class="excluded-values">
+            <span class="excluded-out"><i aria-hidden="true">↓</i>${fmt(d.excludedChi)}đ</span>
+            <span class="excluded-in"><i aria-hidden="true">↑</i>${fmt(d.excludedThu)}đ</span>
+          </div>
+        </div>` : '';
+    const unNote = d.unmapped
+      ? `<p class="cap" style="margin:6px 4px 10px">${d.unmapped} giao dịch chưa khớp bảng Danh mục nên đang tính theo loại Thu/Chi.</p>` : '';
+    $('monthTable').innerHTML = emptyNote + exNote + unNote + `<table class="tbl"><thead><tr><th>Ngày</th><th class="r">Chi</th><th class="r">Thu</th></tr></thead>
       <tbody>${body}</tbody>
       <tfoot><tr class="total"><td>Tổng</td><td class="r c-chi">${fmt(d.totalChi)}</td><td class="r c-thu">${fmt(d.totalThu)}</td></tr></tfoot></table>`;
   } catch (err) {
@@ -525,18 +631,15 @@ function renderBalance(b) {
   const bal = b.thu - b.chi;
   const el = $('balBand');
   el.classList.remove('hide');
-  el.innerHTML = `<div class="bal"><span class="bl">Còn lại</span><b class="bn">${bal < 0 ? '-' : ''}${fmt(Math.abs(bal))}đ</b></div>` +
-    `<div class="tc"><span class="in" title="Thu" aria-label="Thu ${fmt(b.thu)} đồng"><i aria-hidden="true">▲</i>${fmt(b.thu)}đ</span>` +
-    `<span class="out" title="Chi" aria-label="Chi ${fmt(b.chi)} đồng"><i aria-hidden="true">▼</i>${fmt(b.chi)}đ</span></div>`;
+  el.innerHTML = `<div class="bal"><span class="bl" aria-label="Còn lại"></span><b class="bn">${bal < 0 ? '-' : ''}${fmt(Math.abs(bal))}đ</b></div>` +
+    `<div class="tc"><span class="in" title="Thu" aria-label="Thu ${fmt(b.thu)} đồng"><i aria-hidden="true">↑</i>${fmt(b.thu)}đ</span>` +
+    `<span class="out" title="Chi" aria-label="Chi ${fmt(b.chi)} đồng"><i aria-hidden="true">↓</i>${fmt(b.chi)}đ</span></div>`;
 }
-let balanceRequestId = 0;
 async function loadBalance() {
-  const requestId = ++balanceRequestId;
   const [y, m] = todayStr().slice(0, 7).split('-').map(Number);
   try {
     const d = await api('month', { year: y, month: m });
-    if (requestId !== balanceRequestId) return;
-    const b = { y, m, chi: moneyNumber(d.totalChi), thu: moneyNumber(d.totalThu) };
+    const b = { y, m, chi: d.totalChi, thu: d.totalThu };
     try { localStorage.setItem('bal_v1', JSON.stringify(b)); } catch (e) {}
     renderBalance(b);
   } catch (err) { /* giữ số cũ nếu lỗi mạng */ }
@@ -608,9 +711,7 @@ function donutSvg(groups, total) {
     <text x="100" y="114" text-anchor="middle" font-size="${txt.length > 10 ? 13 : 16}" font-weight="700" fill="var(--ink)">${txt}</text></svg>`;
 }
 
-let chartRequestId = 0;
 async function loadChart() {
-  const requestId = ++chartRequestId;
   const r = chartRange();
   document.querySelectorAll('[data-pick="ctype"]').forEach(b => b.classList.toggle('on', b.dataset.v === chart.type));
   document.querySelectorAll('[data-pick="cperiod"]').forEach(b => b.classList.toggle('on', b.dataset.v === chart.period));
@@ -619,42 +720,17 @@ async function loadChart() {
   $('chartList').innerHTML = '';
   try {
     const d = await api('breakdown', { from: r.from, to: r.to, type: chart.type });
-    // Nếu người dùng đổi kỳ trong lúc API đang trả lời, bỏ qua phản hồi cũ.
-    if (requestId !== chartRequestId) return;
-
-    const total = moneyNumber(d.total);
-    if (!Array.isArray(d.groups)) throw new Error('API không trả về danh sách danh mục cho biểu đồ.');
-    let groups = d.groups.map(g => ({
-      name: String(g.name || '(trống)'),
-      total: moneyNumber(g.total),
-      count: moneyNumber(g.count)
-    })).filter(g => g.total > 0).sort((a, b) => b.total - a.total);
-
-    if (!(total > 0) || !groups.length) {
-      $('chartCard').innerHTML = '<span class="muted">Chưa có ' + (chart.type === 'thu' ? 'khoản thu' : 'khoản chi') + ' nào trong khoảng ' + r.from + ' đến ' + r.to + '.</span>';
-      return;
+    if (!d.total) { $('chartCard').innerHTML = '<span class="muted">Chưa có ' + (chart.type === 'thu' ? 'khoản thu' : 'khoản chi') + ' nào trong khoảng này.</span>'; return; }
+    let groups = d.groups;
+    if (groups.length > PALETTE.length) {                      // gộp phần đuôi thành "Khác"
+      const head = groups.slice(0, PALETTE.length - 1), tail = groups.slice(PALETTE.length - 1);
+      groups = head.concat([{ name: 'Khác (' + tail.length + ' mục)', total: tail.reduce((s, g) => s + g.total, 0), count: 0 }]);
     }
-
-    // Chuẩn hóa tổng theo chính các nhóm được API trả về để phần trăm và biểu đồ khớp nhau.
-    const chartTotal = groups.reduce((sum, g) => sum + g.total, 0);
-    if (!(chartTotal > 0)) throw new Error('Tổng tiền các danh mục bằng 0 hoặc không hợp lệ.');
-
-    if (groups.length > PALETTE.length) {
-      const head = groups.slice(0, PALETTE.length - 1);
-      const tail = groups.slice(PALETTE.length - 1);
-      groups = head.concat([{
-        name: 'Khác (' + tail.length + ' mục)',
-        total: tail.reduce((sum, g) => sum + g.total, 0),
-        count: tail.reduce((sum, g) => sum + g.count, 0)
-      }]);
-    }
-
-    $('chartCard').innerHTML = donutSvg(groups, chartTotal);
+    $('chartCard').innerHTML = donutSvg(groups, d.total);
     $('chartList').innerHTML = groups.map((g, i) =>
-      `<div class="lrow"><i class="ldot" style="background:${PALETTE[i % PALETTE.length]}"></i><span class="ln">${esc(g.name)}<small class="cap">${g.count} giao dịch</small></span><span class="lp">${Math.round(g.total / chartTotal * 100)}%</span><span class="la">${fmt(g.total)}đ</span></div>`).join('');
+      `<div class="lrow"><i class="ldot" style="background:${PALETTE[i % PALETTE.length]}"></i><span class="ln">${esc(g.name)}</span><span class="lp">${Math.round(g.total / d.total * 100)}%</span><span class="la">${fmt(g.total)}đ</span></div>`).join('');
   } catch (err) {
-    if (requestId !== chartRequestId) return;
-    $('chartCard').innerHTML = '<span class="err">Lỗi tải biểu đồ: ' + esc(err.message) + '</span>';
+    $('chartCard').innerHTML = '<span class="err">Lỗi: ' + esc(err.message) + '</span>';
   }
 }
 
@@ -675,17 +751,17 @@ async function loadCredit() {
     const left = n => n.daysLeft === 0 ? 'Hôm nay' : 'Còn ' + n.daysLeft + ' ngày';
     const st = d.nextStatement, du = d.nextDue;
     $('crSt').textContent = st ? fmtDMY(st.date) : (d.statementRaw || '–');
-    $('crStSub').textContent = st ? left(st) + ' · hằng tháng ngày ' + d.statementDay : 'Chưa đọc được trong sheet';
+    $('crStSub').textContent = st ? left(st) : 'Chưa đọc được trong sheet';
+    $('crStSub').classList.add('credit-sub');
     $('crDue').textContent = du ? fmtDMY(du.date) : (d.dueRaw || '–');
     $('crDue').style.color = du && du.daysLeft <= 3 ? 'var(--danger)' : '';
-    $('crDueSub').textContent = du
-      ? left(du) + (d.dueOffsetDays != null ? ' · ' + d.dueOffsetDays + ' ngày sau ngày sao kê' : ' · hằng tháng ngày ' + d.dueDay)
-      : 'Chưa đọc được trong sheet';
+    $('crDueSub').textContent = du ? left(du) : 'Chưa đọc được trong sheet';
+    $('crDueSub').classList.add('credit-sub');
 
     $('crCycle').innerHTML = d.cycle
-      ? `<span class="label" style="margin-bottom:4px">Kỳ sao kê hiện tại · ${fmtDMY(d.cycle.from)} – ${fmtDMY(d.cycle.to)}</span>
-         <b style="font-size:24px;color:var(--chi)">${fmt(d.cycle.total)}đ</b> <span class="muted">· ${d.cycle.count} giao dịch</span>`
-      : '<span class="muted">Chưa xác định được ngày sao kê nên chưa tính kỳ hiện tại.</span>';
+      ? `<span class="credit-cycle-label">Kỳ sao kê</span><div class="credit-cycle-dates">${fmtDMY(d.cycle.from)} – ${fmtDMY(d.cycle.to)}</div>
+         <b class="credit-cycle-amount" style="color:var(--chi)">${fmt(d.cycle.total)}đ</b> <span class="muted credit-cycle-count">· ${d.cycle.count} giao dịch</span>`
+      : '<span class="muted credit-sub">Chưa xác định được ngày sao kê nên chưa tính kỳ hiện tại.</span>';
 
     const head = `<div class="item"><b>Tổng chi tín dụng tháng ${m}/${y}</b><b class="amt" style="color:var(--chi)">${fmt(d.totalChi)}đ</b></div>`;
     $('crList').innerHTML = head + (d.items.length ? d.items.map(it => `
