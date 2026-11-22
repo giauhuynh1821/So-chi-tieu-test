@@ -12,11 +12,11 @@
 <style>
 :root{
   --bg:#F3F5F9; --card:#FFFFFF; --ink:#172033; --muted:#667085; --line:#D5DAE3; --seg:#E4E8F0;
-  --chi:#c62828; --thu:#2e7d32; --on-accent:#FFFFFF; --danger:#B42318;
+  --chi:#c62828; --thu:#2e7d32; --on-accent:#FFFFFF; --danger:#B42318; --warn:#B45309;
 }
 :root[data-theme="dark"]{
   --bg:#0F141C; --card:#1A222E; --ink:#E8ECF3; --muted:#9AA4B5; --line:#2E3849; --seg:#232C3A;
-  --chi:#EF5350; --thu:#66BB6A; --on-accent:#10161F; --danger:#F97066;
+  --chi:#EF5350; --thu:#66BB6A; --on-accent:#10161F; --danger:#F97066; --warn:#F59E0B;
 }
 :root[data-type="chi"]{--accent:var(--chi)}
 :root[data-type="thu"]{--accent:var(--thu)}
@@ -27,8 +27,6 @@ button,input{font-family:inherit;color:inherit}
 #app{max-width:480px;margin:0 auto;padding:16px 16px calc(170px + env(safe-area-inset-bottom))}
 header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 h1{margin:0;font-size:22px;font-weight:700}
-header .exit-form{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:8px 12px;font-size:14px;font-weight:600;cursor:pointer}
-header .exit-form.hide{display:none}
 
 .pill{height:36px;padding:0 14px;border-radius:18px;background:var(--card);border:1px solid var(--line);font-size:13px;font-weight:500}
 input[type=date].pill,input[type=month].pill{width:auto}
@@ -36,8 +34,8 @@ input[type=date].pill,input[type=month].pill{width:auto}
 .seg button{flex:1;height:44px;border:0;border-radius:12px;background:transparent;color:var(--muted);font-size:15px;font-weight:600;cursor:pointer}
 .seg button.on{background:var(--accent);color:var(--on-accent)}
 .seg.tabs button.on,.seg.plain button.on{background:var(--card);color:var(--ink)}
-#bottomTabs{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(100%,480px);z-index:30;margin:0;padding:7px 8px calc(7px + env(safe-area-inset-bottom));border-radius:18px 18px 0 0;background:var(--seg);box-shadow:0 -5px 18px rgba(0,0,0,.22);gap:2px}
-#bottomTabs button{height:50px;min-width:0;padding:0 2px;font-size:clamp(10px,3.1vw,14px);white-space:nowrap}
+#bottomTabs{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(100%,480px);z-index:30;margin:0;padding:7px 6px calc(7px + env(safe-area-inset-bottom));border-radius:18px 18px 0 0;background:var(--seg);box-shadow:0 -5px 18px rgba(0,0,0,.22);gap:2px}
+#bottomTabs button{height:50px;min-width:0;padding:0 1px;font-size:clamp(9.5px,2.7vw,13px);white-space:nowrap}
 #bottomTabs.hide{display:none}
 
 section{margin-bottom:16px}
@@ -49,6 +47,7 @@ section{margin-bottom:16px}
 .row{display:flex;flex-wrap:wrap;gap:8px}
 .chip{height:44px;padding:0 16px;border-radius:22px;border:1px solid var(--line);background:var(--card);font-size:14px;font-weight:500;cursor:pointer}
 .chip.on{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.chip.sm{height:36px;padding:0 12px;font-size:13px;border-style:dashed}
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .tile{min-height:68px;padding:12px;border-radius:14px;border:1px solid var(--line);background:var(--card);font-size:13px;font-weight:500;display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;text-align:left;cursor:pointer}
 .tile i{width:8px;height:8px;border-radius:4px;display:block}
@@ -58,25 +57,31 @@ footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:
 footer .in{max-width:480px;margin:0 auto}
 footer .in.actions{display:flex;gap:10px}
 footer .actions .save{flex:1;width:auto}
-.cancel{flex:0 0 34%;height:56px;border:1px solid var(--line);border-radius:16px;background:var(--seg);color:var(--ink);font-size:16px;font-weight:700;cursor:pointer}
-
+.cancel{flex:0 0 28%;height:56px;border:1px solid var(--line);border-radius:16px;background:var(--seg);color:var(--ink);font-size:16px;font-weight:700;cursor:pointer}
+.delbtn{flex:0 0 auto;height:56px;padding:0 16px;border:1px solid var(--chi);border-radius:16px;background:transparent;color:var(--chi);font-size:16px;font-weight:700;cursor:pointer}
 .save{width:100%;height:56px;border:0;border-radius:16px;background:var(--accent);color:var(--on-accent);font-size:16px;font-weight:700;cursor:pointer}
 .save:disabled{opacity:.6}
+.editbar{background:var(--seg);border-radius:14px;padding:10px 14px;margin-bottom:14px;font-size:13px;font-weight:600;line-height:1.4}
+.editbar small{display:block;font-weight:400;color:var(--muted);font-size:11px}
+.delconf{background:var(--card);border:1px solid var(--chi);border-radius:16px;padding:14px 16px;margin-top:4px}
+.delconf .row{margin-top:10px;flex-wrap:nowrap}
+.delconf button{flex:1;height:48px;border-radius:14px;border:1px solid var(--line);background:var(--seg);font-size:15px;font-weight:700;cursor:pointer}
+.delconf button.yes{background:var(--chi);border-color:var(--chi);color:var(--on-accent)}
+
 .sum{display:flex;gap:12px;margin-bottom:16px}
 .sum .card{flex:1;padding:10px 12px}
 .sum b{display:block;font-size:17px;margin-top:3px}
 .sum .mv b{font-size:18px;margin-top:0}
 .sum .mv{display:flex;align-items:center;gap:5px;white-space:nowrap}
-.sum.three .mv b{font-size:13px}
-.sum.three .card{padding:9px 10px}
-.sum.three b{font-size:13px;margin-top:3px;white-space:nowrap}
-.item{display:flex;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 0;border-bottom:1px solid var(--line)}
 .item:last-child{border-bottom:0}
+.item .m{flex:1;min-width:0}
 .item small{display:block;color:var(--muted);margin-top:2px;font-size:11px;font-style:italic;line-height:1.35}
+.pen{flex:0 0 auto;min-width:46px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--seg);font-size:13px;font-weight:600;cursor:pointer}
 .amt{font-weight:700;white-space:nowrap}
 .muted{color:var(--muted);font-size:14px}
 .err{color:var(--danger);font-size:14px}
-#toast{position:fixed;top:12px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:14px;font-size:14px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90%;z-index:10}
+#toast{position:fixed;top:12px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:14px;font-size:14px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90%;z-index:40}
 #toast.show{opacity:1}
 .pendingbar{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px 8px 8px 14px;margin-bottom:16px;font-size:13px;color:var(--muted)}
 .pendingbar button{height:36px;padding:0 14px;border-radius:18px;border:1px solid var(--line);background:var(--card);font-size:13px;font-weight:500;cursor:pointer}
@@ -93,9 +98,6 @@ footer .actions .save{flex:1;width:auto}
 .tbl tbody tr[data-pick]{cursor:pointer}
 .card.tight{padding:8px 14px}
 .seg.tabs{overflow:hidden}
-.seg.tabs button{flex:1 1 0;min-width:0;padding:0 2px;font-size:13px;white-space:nowrap}
-.tab-add{display:inline-flex;align-items:center;justify-content:center;margin-left:3px;width:17px;height:17px;border-radius:50%;background:var(--line);color:var(--ink);font-size:14px;font-weight:700;line-height:1;vertical-align:middle;cursor:pointer}
-.tab-add:active{transform:scale(.92)}
 .fab-add{position:fixed;right:max(18px,calc((100vw - 480px)/2 + 18px));bottom:calc(88px + env(safe-area-inset-bottom));z-index:20;width:54px;height:54px;border:0;border-radius:50%;background:var(--accent);color:var(--on-accent);font-size:32px;font-weight:500;line-height:1;box-shadow:0 6px 18px rgba(0,0,0,.28);display:flex;align-items:center;justify-content:center;cursor:pointer}
 .fab-add:active{transform:scale(.94)}
 .fab-add.hide{display:none}
@@ -109,7 +111,7 @@ footer .actions .save{flex:1;width:auto}
 .band .bal .bl:before{content:'◈';font-size:21px}
 .band .in{color:var(--thu)}
 .band .out{color:var(--chi)}
-.sum.three b{font-size:15px}.sum.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%;min-width:0}
+.sum.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%;min-width:0}
 .sum.three .card{min-width:0;max-width:100%;overflow:hidden;padding:9px 6px}
 .sum.three .mv{display:flex;align-items:center;justify-content:center;gap:3px;min-width:0;white-space:nowrap}
 .sum.three .mv i{flex:0 0 auto;font-size:11px}
@@ -118,9 +120,6 @@ footer .actions .save{flex:1;width:auto}
 #view-month .label{font-size:11px;line-height:1.35;letter-spacing:.02em;margin:2px 0 10px}
 
 .cap{display:block;font-size:11px;line-height:1.35;color:var(--muted);margin-top:2px}
-.sum .mv{display:flex;align-items:baseline;gap:6px}
-.sum .mv i{font-style:normal;font-size:12px}
-.sum .mv b{font-size:22px;margin-top:0}
 .sum:not(.three) .mv b{font-size:18px}
 #crSt,#crDue{font-size:16px}
 .credit-sub{font-size:10px;line-height:1.3;font-style:italic}
@@ -135,7 +134,6 @@ footer .actions .save{flex:1;width:auto}
 .excluded-out{color:var(--chi)}
 .excluded-in{color:var(--thu)}
 .credit-cycle-count{font-size:10px;font-style:italic}
-/* Mục con được ẩn/hiện theo dữ liệu danh mục trong renderChoices() */
 .nav{display:flex;align-items:center;justify-content:space-between;margin:4px 0 12px}
 .nav button{width:44px;height:44px;border-radius:22px;border:1px solid var(--line);background:var(--card);font-size:20px;cursor:pointer}
 .nav span{font-weight:600;font-size:15px}
@@ -144,6 +142,29 @@ footer .actions .save{flex:1;width:auto}
 .ln{flex:1;min-width:0;font-weight:500}
 .lp{color:var(--muted);font-size:13px;width:44px;text-align:right}
 .la{font-weight:700;white-space:nowrap}
+
+/* Công nợ */
+.dp{background:var(--card);border-radius:18px;margin-bottom:10px;overflow:hidden}
+.dph{width:100%;border:0;background:transparent;text-align:left;padding:14px 16px;cursor:pointer;display:block}
+.dtop{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.dnm{font-size:16px;font-weight:600}
+.drem{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
+.dsub{display:flex;justify-content:space-between;gap:8px;margin-top:6px;font-size:12px;color:var(--muted)}
+.dbar{height:6px;border-radius:3px;background:var(--seg);margin-top:10px;overflow:hidden}
+.dbar i{display:block;height:100%;background:var(--thu)}
+.dtag{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;vertical-align:middle;border:1px solid var(--line)}
+.dtag.owe{color:var(--warn);border-color:var(--warn)}
+.dtag.done{color:var(--thu);border-color:var(--thu)}
+.dtag.over{color:var(--chi);border-color:var(--chi)}
+.ddet{display:none;border-top:1px solid var(--line);padding:6px 16px 14px}
+.dp.open .ddet{display:block}
+.dh{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
+.dh small{display:block;color:var(--muted);font-size:11px;font-style:italic;margin-top:2px}
+.din{color:var(--thu);font-weight:700;white-space:nowrap}
+.dout{color:var(--chi);font-weight:700;white-space:nowrap}
+.dact{margin-top:10px;width:100%;height:44px;border-radius:14px;border:1px solid var(--line);background:var(--seg);font-size:14px;font-weight:600;cursor:pointer}
+.dchk{background:rgba(245,158,11,.14);border:1px solid var(--warn);border-radius:18px;padding:14px 16px;margin-top:16px;font-size:13px;line-height:1.5}
+.dchk button.dh{width:100%;background:transparent;border:0;border-bottom:1px solid var(--line);text-align:left;cursor:pointer}
 .hide{display:none}
 </style>
 </head>
@@ -162,26 +183,32 @@ footer .actions .save{flex:1;width:auto}
     <button type="button" class="on" data-tab="lookup">Tra cứu</button>
     <button type="button" data-tab="month">Tháng</button>
     <button type="button" data-tab="chart">Biểu đồ</button>
+    <button type="button" data-tab="debt">Công nợ</button>
     <button type="button" data-tab="credit">Tín dụng</button>
   </div>
 
-  <!-- TAB GHI CHÉP -->
+  <!-- TAB GHI CHÉP / SỬA -->
   <div id="view-form" class="hide">
+    <div id="editBar" class="editbar hide" role="status"></div>
     <section>
       <label class="label" for="date">1. Ngày giao dịch</label>
       <input id="date" class="field" type="date" aria-label="Ngày giao dịch">
     </section>
     <div class="seg" role="group" aria-label="Loại giao dịch">
-      <span class="label" style="display:none">2. Loại giao dịch</span>
       <button type="button" data-pick="type" data-v="Chi" class="on">Chi</button>
       <button type="button" data-pick="type" data-v="Thu">Thu</button>
     </div>
 
     <section><span class="label">3. Nguồn tiền</span><div id="srcBox" class="row"></div></section>
     <section><span class="label">4. Danh mục</span><div id="menuBox"><span class="muted">Đang tải danh mục...</span></div></section>
-    <section id="subSec" class="hide"><span class="label">5. Gợi ý mục con</span><div id="subBox" class="row"></div><span id="subHint" class="cap"></span></section>
+    <section id="subSec" class="hide"><span class="label">5. Mục con</span><div id="subBox" class="row"></div><span id="subHint" class="cap"></span></section>
     <section id="peopleSec" class="hide"><span class="label">6. Người liên quan (nếu có)</span><div id="peopleBox" class="row"></div></section>
-    <section><label class="label" for="note">7. Ghi chú (nếu có)</label><input id="note" class="field" type="text" autocomplete="off"></section>
+    <section>
+      <label class="label" for="note">7. Ghi chú (nếu có)</label>
+      <input id="note" class="field" type="text" autocomplete="off">
+      <div id="noteSug" class="row" style="margin-top:8px"></div>
+      <span id="noteHint" class="cap"></span>
+    </section>
     <section class="card">
       <label class="label" for="money">8. Số tiền · nhập cuối cùng</label>
       <div class="money"><input id="money" type="text" inputmode="numeric" placeholder="0" autocomplete="off"><span>đ</span></div>
@@ -191,7 +218,11 @@ footer .actions .save{flex:1;width:auto}
         <button type="button" class="chip" data-pick="quick" data-v="100000">+100.000</button>
       </div>
     </section>
-
+    <div id="delConfirm" class="delconf hide" role="alertdialog" aria-label="Xác nhận xóa">
+      <b>Xóa giao dịch này?</b>
+      <span class="cap">Dòng tương ứng trong sheet DATA sẽ bị xóa và không khôi phục được.</span>
+      <div class="row"><button type="button" id="delNo">Giữ lại</button><button type="button" id="delYes" class="yes">Xóa</button></div>
+    </div>
   </div>
 
   <!-- TAB TRA CỨU -->
@@ -240,6 +271,20 @@ footer .actions .save{flex:1;width:auto}
     <div id="chartList"></div>
   </div>
 
+  <!-- TAB CÔNG NỢ -->
+  <div id="view-debt" class="hide">
+    <div class="sum">
+      <div class="card"><span class="label" style="margin:0 0 4px">Còn phải thu</span><b id="dSumRec">0đ</b><span class="cap" id="dCapRec"></span></div>
+      <div class="card"><span class="label" style="margin:0 0 4px">Còn phải trả</span><b id="dSumPay">0đ</b><span class="cap" id="dCapPay"></span></div>
+    </div>
+    <div class="seg plain" role="group" aria-label="Loại công nợ">
+      <button type="button" class="on" data-pick="dkind" data-v="rec">Cho mượn</button>
+      <button type="button" data-pick="dkind" data-v="pay">Đang nợ</button>
+    </div>
+    <div id="debtList"><span class="muted">Đang tải...</span></div>
+    <div id="debtChk"></div>
+  </div>
+
   <!-- TAB TÍN DỤNG -->
   <div id="view-credit" class="hide">
     <div class="sum">
@@ -255,13 +300,13 @@ footer .actions .save{flex:1;width:auto}
   <div id="appVer" class="appver"></div>
 </div>
 
-<footer id="saveBar" class="hide"><div class="in actions"><button id="cancelBtn" class="cancel" type="button">Hủy</button><button id="saveBtn" class="save" type="button">Lưu giao dịch</button></div></footer>
+<footer id="saveBar" class="hide"><div class="in actions"><button id="delBtn" class="delbtn hide" type="button">Xóa</button><button id="cancelBtn" class="cancel" type="button">Hủy</button><button id="saveBtn" class="save" type="button">Lưu giao dịch</button></div></footer>
 <button id="fabAdd" class="fab-add" type="button" aria-label="Thêm giao dịch" title="Thêm giao dịch">+</button>
 <div id="toast" role="status"></div>
 
 <script>
 /* ===== API_URL nằm trong file config.js (sửa một lần, không bị mất khi thay index.html) ===== */
-const APP_VERSION = 'v36-demo';
+const APP_VERSION = 'v37';
 const API_URL = (window.APP_CONFIG && window.APP_CONFIG.API_URL) || '';
 const SEP = '.';            // dấu phân cách hàng nghìn: '.' (khớp sheet) hoặc ','
 const TZ = 'Asia/Ho_Chi_Minh';
@@ -297,10 +342,11 @@ const uniq = a => {
 const state = {
   type: 'Chi', source: '', menu: '', sub: '', person: '', amount: 0, date: todayStr(),
   categories: [], people: [], history: [], loaded: false,
+  editId: '', noteTyped: false,
 };
 
 /* ---------- GỌI API ---------- */
-const API_CACHE_PREFIX = 'mini_api_cache_v36:';
+const API_CACHE_PREFIX = 'mini_api_cache_v37:';
 const API_CACHE_TTL = 45 * 1000; // cache 45 giây
 function apiCacheKey(action, payload) {
   return API_CACHE_PREFIX + action + ':' + JSON.stringify(payload || {});
@@ -326,7 +372,7 @@ function clearApiCache() {
 }
 
 async function api(action, payload) {
-  const cacheable = ['day', 'month', 'breakdown', 'credit'].includes(action);
+  const cacheable = ['day', 'month', 'breakdown', 'credit', 'debt'].includes(action);
   if (cacheable) {
     const cached = readApiCache(action, payload);
     if (cached) return cached;
@@ -352,14 +398,13 @@ async function api(action, payload) {
   showVer(data.v);
   if (!data.ok) throw new Error(data.error || 'Lỗi không xác định');
   if (cacheable) writeApiCache(action, payload, data);
-  if (action === 'add') clearApiCache();
+  if (['add', 'update', 'delete'].includes(action)) clearApiCache();
   return data;
 }
 
-// Hiện cạnh tiêu đề: bản app · bản API đang trả lời · đuôi link API (để đối chiếu với ID bản triển khai)
+// Nhãn cuối trang: bản app · bản API đang trả lời
 function showVer(apiV) {
   const tail = API_URL.replace(/\/exec$/, '').slice(-6);
-  // Chỉ hiện số phiên bản app; thông tin API chỉ xem khi rê chuột/nhấn giữ
   $('appVer').textContent = 'Mini App ' + APP_VERSION + ' · ' + (apiV || 'API cũ (chưa có số phiên bản)');
   $('appVer').title = 'Đuôi link API: …' + tail;
 }
@@ -367,7 +412,7 @@ function showVer(apiV) {
 let toastTimer;
 function toast(msg) {
   const t = $('toast'); t.textContent = msg; t.classList.add('show');
-  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
 }
 function haptic(kind) { if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred(kind); }
 
@@ -380,51 +425,61 @@ const normKey = v => String(v || '').trim().toLocaleLowerCase('vi');
 const same = (a, b) => normKey(a) === normKey(b);
 const sources = () => uniq(rows().map(r => r.source).filter(Boolean));
 const menus = () => uniq(rows().filter(r => same(r.source, state.source)).map(r => r.menu).filter(Boolean));
+// Mục con CHỈ lấy từ sheet Danh mục
 const categorySubs = () => uniq(rows().filter(r => same(r.source, state.source) && same(r.menu, state.menu)).map(r => r.sub).filter(Boolean));
+// Gợi ý ghi chú (nội dung từng ghi nhiều lần) theo loại, nguồn tiền, danh mục
 const historyGroup = () => (state.history || []).find(g =>
   same(g.type, state.type) && same(g.source, state.source) && same(g.menu, state.menu));
-const historySubs = () => {
+const cleanPerson = p => normKey(p) === 'chưa có người' ? '' : String(p || '');
+const noteSuggestions = () => {
   const g = historyGroup();
   return g ? (g.items || []).map(x => x.value).filter(Boolean) : [];
 };
-const subs = () => uniq(categorySubs().concat(historySubs()));
 
 function fixSelection() {
   const s = sources();
   if (!s.some(v => same(v, state.source))) state.source = s.find(v => same(v, 'Mặc định')) || (s[0] || '');
   if (!menus().some(v => same(v, state.menu))) state.menu = '';
-  if (!subs().some(v => same(v, state.sub))) state.sub = '';
-  if (state.menu && !historyGroup()) state.person = '';
+  if (!categorySubs().some(v => same(v, state.sub))) state.sub = '';
+  if (!/vay|nợ/i.test(state.menu)) state.person = '';
 }
 
 /* ---------- VẼ CÁC NHÓM LỰA CHỌN ---------- */
 function renderChoices() {
   $('srcBox').innerHTML = sources().map(v =>
-    `<button type="button" class="chip ${v === state.source ? 'on' : ''}" data-pick="source" data-v="${esc(v)}">${esc(v)}</button>`).join('')
+    `<button type="button" class="chip ${same(v, state.source) ? 'on' : ''}" data-pick="source" data-v="${esc(v)}">${esc(v)}</button>`).join('')
     || '<span class="muted">Chưa có nguồn tiền</span>';
 
   const m = menus();
   $('menuBox').innerHTML = m.length ? `<div class="grid">${m.map((v, i) =>
-    `<button type="button" class="tile ${v === state.menu ? 'on' : ''}" data-pick="menu" data-v="${esc(v)}"><i style="background:${DOTS[i % DOTS.length]}"></i>${esc(v)}</button>`).join('')}</div>`
+    `<button type="button" class="tile ${same(v, state.menu) ? 'on' : ''}" data-pick="menu" data-v="${esc(v)}"><i style="background:${DOTS[i % DOTS.length]}"></i>${esc(v)}</button>`).join('')}</div>`
     : '<span class="muted">Chọn nguồn tiền để xem danh mục</span>';
 
-  // Lấy mục con từ sheet Danh mục; đồng thời giữ gợi ý lịch sử như bản người dùng cung cấp.
-  const definedSubs = categorySubs();
-  const historicalSubs = historySubs();
-  const sb = uniq(definedSubs.concat(historicalSubs));
+  // Mục con: chỉ theo sheet Danh mục. Khi đang sửa, giữ lại mục con cũ nếu nó không còn trong Danh mục.
+  const defined = categorySubs();
+  const orphan = state.sub && !defined.some(d => same(d, state.sub)) ? [state.sub] : [];
+  const sb = defined.concat(orphan);
   $('subSec').classList.toggle('hide', !sb.length);
-  $('subBox').innerHTML = sb.map(v => {
-    const fromHistory = historicalSubs.some(h => same(h, v)) && !definedSubs.some(d => same(d, v));
-    return `<button type="button" class="chip ${same(v, state.sub) ? 'on' : ''}" data-pick="sub" data-v="${esc(v)}">${esc(v)}${fromHistory ? ' ↺' : ''}</button>`;
-  }).join('');
-  $('subHint').textContent = historicalSubs.length
-    ? 'Gợi ý có cả mục con trong Danh mục và nội dung từng ghi trong DATA (↺).'
-    : (definedSubs.length ? 'Gợi ý lấy từ sheet Danh mục.' : '');
+  $('subBox').innerHTML = sb.map(v =>
+    `<button type="button" class="chip ${same(v, state.sub) ? 'on' : ''}" data-pick="sub" data-v="${esc(v)}">${esc(v)}${orphan.includes(v) ? ' (hiện tại)' : ''}</button>`).join('');
+  $('subHint').textContent = defined.length ? 'Lấy từ sheet Danh mục.' : '';
 
   const showPeople = /vay|nợ/i.test(state.menu) && state.people.length;
   $('peopleSec').classList.toggle('hide', !showPeople);
   $('peopleBox').innerHTML = showPeople ? state.people.map(v =>
     `<button type="button" class="chip ${same(v, state.person) ? 'on' : ''}" data-pick="person" data-v="${esc(v)}">${esc(v)}</button>`).join('') : '';
+
+  renderNoteSug();
+}
+
+// Gợi ý nằm ngay dưới ô Ghi chú; chỉ lọc theo chữ sau khi người dùng gõ
+function renderNoteSug() {
+  const all = noteSuggestions();
+  const cur = normKey($('note').value), q = state.noteTyped ? cur : '';
+  const list = all.filter(v => normKey(v) !== cur && (!q || normKey(v).includes(q)));
+  $('noteSug').innerHTML = list.map(v =>
+    `<button type="button" class="chip sm" data-pick="note" data-v="${esc(v)}">${esc(v)}</button>`).join('');
+  $('noteHint').textContent = all.length ? 'Gợi ý từ các ghi chú đã dùng nhiều lần cho danh mục này. Chạm để điền.' : '';
 }
 
 function syncType() {
@@ -442,41 +497,55 @@ document.addEventListener('keydown', e => {
   }
 });
 $('fabAdd').addEventListener('click', openEntryFromCurrentTab);
-$('cancelBtn').addEventListener('click', () => showTab(returnTabAfterSave || 'lookup'));
-
+$('cancelBtn').addEventListener('click', () => { const back = returnTabAfterSave || 'lookup'; if (state.editId) exitEdit(); showTab(back); });
 
 document.addEventListener('click', e => {
   const addForm = e.target.closest('[data-add-form]');
   if (addForm) { e.preventDefault(); e.stopPropagation(); showTab('form'); return; }
   const tab = e.target.closest('[data-tab]');
-  if (tab) return showTab(tab.dataset.tab);
+  if (tab) { if (state.editId) exitEdit(); return showTab(tab.dataset.tab); }
+  const ed = e.target.closest('[data-edit]');
+  if (ed) { const it = dayItems[ed.dataset.edit]; if (it) openEdit(it); return; }
+  const dp = e.target.closest('.dph');
+  if (dp) { const p = dp.parentElement; p.classList.toggle('open'); dp.setAttribute('aria-expanded', p.classList.contains('open')); return; }
   const b = e.target.closest('[data-pick]');
   if (!b) return;
   const k = b.dataset.pick, v = b.dataset.v;
   if (k === 'type') { state.type = v; state.menu = ''; state.sub = ''; state.person = ''; fixSelection(); syncType(); renderChoices(); }
   else if (k === 'source') { state.source = v; state.menu = ''; state.sub = ''; state.person = ''; renderChoices(); }
-  else if (k === 'menu') { state.menu = v; state.sub = ''; state.person = ''; renderChoices(); }
+  else if (k === 'menu') { state.menu = v; state.sub = ''; if (!/vay|nợ/i.test(v)) state.person = ''; renderChoices(); }
   else if (k === 'sub') { state.sub = same(state.sub, v) ? '' : v; renderChoices(); }
   else if (k === 'person') { state.person = same(state.person, v) ? '' : v; renderChoices(); }
+  else if (k === 'note') { $('note').value = v; state.noteTyped = false; renderNoteSug(); }
   else if (k === 'quick') { setAmount(state.amount + Number(v)); }
   else if (k === 'retry') { syncQueue(); }
   else if (k === 'ctype') { chart.type = v; loadChart(); }
   else if (k === 'cperiod') { chart.period = v; loadChart(); }
   else if (k === 'cshift') { shiftChart(Number(v)); }
   else if (k === 'gotoday') { state.date = v; $('date').value = v; showTab('lookup'); }
+  else if (k === 'dkind') { debtKind = v; renderDebt(); }
+  else if (k === 'dact') { const r = debtView[Number(v)]; if (r) prefillNew(debtKind === 'rec'
+      ? { type: 'Thu', menu: 'Cho Vay, trả nợ', sub: 'nhận tiền cho vay', person: r.n }
+      : { type: 'Chi', menu: 'Cho Vay, trả nợ', sub: 'trả nợ', person: r.n }); }
+  else if (k === 'dedit') { const it = debtData && debtData.unlinked[Number(v)]; if (it) openEdit(it); }
 });
 
 function setAmount(n) { state.amount = n; $('money').value = n ? fmt(n) : ''; }
 $('money').addEventListener('input', e => setAmount(Number(e.target.value.replace(/\D/g, '')) || 0));
-$('date').addEventListener('change', e => { state.date = e.target.value || todayStr(); loadDay(); });
+$('note').addEventListener('input', () => { state.noteTyped = true; renderNoteSug(); });
+$('date').addEventListener('change', e => {
+  if (state.editId) return;                       // đang sửa: ngày chỉ áp dụng cho giao dịch này
+  state.date = e.target.value || todayStr(); loadDay();
+});
 $('date').value = state.date;
 $('lookupDate').value = state.date;
 $('lookupDate').addEventListener('change', e => { state.date = e.target.value || todayStr(); $('date').value = state.date; loadDay(); });
 
 let returnTabAfterSave = 'lookup';
+const TAB_NAMES = ['lookup', 'month', 'chart', 'debt', 'credit'];
+const currentTab = () => TAB_NAMES.find(v => !$('view-' + v).classList.contains('hide')) || 'lookup';
 function openEntryFromCurrentTab() {
-  const current = ['lookup','month','chart','credit'].find(v => !$('view-' + v).classList.contains('hide')) || 'lookup';
-  returnTabAfterSave = current;
+  returnTabAfterSave = currentTab();
   showTab('form');
 }
 
@@ -484,9 +553,9 @@ function showTab(name) {
   if (name === 'form' && !$('view-form').classList.contains('hide')) {
     // Đang ở form thì giữ nguyên tab nguồn đã ghi nhớ.
   } else if (name === 'form') {
-    returnTabAfterSave = ['lookup','month','chart','credit'].find(v => !$('view-' + v).classList.contains('hide')) || 'lookup';
+    returnTabAfterSave = currentTab();
   }
-  ['form', 'lookup', 'month', 'chart', 'credit'].forEach(v => $('view-' + v).classList.toggle('hide', v !== name));
+  ['form'].concat(TAB_NAMES).forEach(v => $('view-' + v).classList.toggle('hide', v !== name));
   $('saveBar').classList.toggle('hide', name !== 'form');
   $('bottomTabs').classList.toggle('hide', name === 'form');
   $('fabAdd').classList.toggle('hide', name === 'form');
@@ -495,8 +564,78 @@ function showTab(name) {
   if (name === 'lookup') loadDay();
   if (name === 'month') loadMonth();
   if (name === 'chart') loadChart();
+  if (name === 'debt') loadDebt();
   if (name === 'credit') loadCredit();
 }
+
+/* ---------- FORM: GHI MỚI, SỬA, XÓA ---------- */
+function resetFormFields() {
+  setAmount(0); $('note').value = ''; state.noteTyped = false;
+  state.menu = ''; state.sub = ''; state.person = '';
+}
+
+function enterEditUI(on) {
+  $('editBar').classList.toggle('hide', !on);
+  $('delBtn').classList.toggle('hide', !on);
+  $('saveBtn').textContent = on ? 'Lưu thay đổi' : 'Lưu giao dịch';
+  $('delConfirm').classList.add('hide');
+}
+
+function exitEdit() {
+  state.editId = '';
+  enterEditUI(false);
+  $('date').value = state.date;
+  resetFormFields();
+  state.source = '';
+  fixSelection(); syncType(); renderChoices();
+}
+
+// Mở form để sửa một giao dịch có sẵn (item: id, date, type, source, menu, sub, note, person, money)
+function openEdit(it) {
+  state.editId = it.id;
+  state.type = /^thu$/i.test(String(it.type).trim()) ? 'Thu' : 'Chi';
+  syncType();
+  state.source = sources().find(v => same(v, it.source)) || it.source || '';
+  state.menu = menus().find(v => same(v, it.menu)) || it.menu || '';
+  state.sub = it.sub || '';
+  state.person = cleanPerson(it.person);
+  state.noteTyped = false;
+  $('note').value = it.note || '';
+  $('date').value = it.date;
+  setAmount(moneyNumber(it.money));
+  $('editBar').innerHTML = `Đang sửa giao dịch<small>ID ${esc(it.id)} · ngày gốc ${fmtDMY(it.date)}</small>`;
+  renderChoices();
+  enterEditUI(true);
+  showTab('form');
+  window.scrollTo(0, 0);
+}
+
+// Mở form ghi mới với vài mục điền sẵn (dùng cho nút Ghi thu hồi / Ghi trả nợ)
+function prefillNew(p) {
+  if (state.editId) exitEdit();
+  resetFormFields();
+  state.type = p.type; syncType();
+  const s = sources();
+  state.source = s.find(v => same(v, 'Mặc định')) || s[0] || '';
+  state.menu = menus().find(v => same(v, p.menu)) || p.menu;
+  state.sub = categorySubs().find(v => same(v, p.sub)) || p.sub || '';
+  state.person = p.person || '';
+  renderChoices();
+  showTab('form');
+  window.scrollTo(0, 0);
+}
+
+$('delBtn').addEventListener('click', () => { $('delConfirm').classList.remove('hide'); if ($('delConfirm').scrollIntoView) $('delConfirm').scrollIntoView({ block: 'center' }); });
+$('delNo').addEventListener('click', () => $('delConfirm').classList.add('hide'));
+$('delYes').addEventListener('click', () => {
+  const q = getQ(); q.push({ op: 'delete', id: state.editId }); setQ(q);
+  haptic('success');
+  toast('Đang xóa giao dịch…');
+  const back = returnTabAfterSave || 'lookup';
+  exitEdit();
+  showTab(back);
+  syncQueue();
+});
 
 /* ---------- LƯU GIAO DỊCH: ghi trước, đồng bộ sau ---------- */
 const QKEY = 'pending_v1';
@@ -509,7 +648,7 @@ function renderPending() {
   const n = getQ().length;
   const bar = $('pendingBar');
   bar.classList.toggle('hide', n === 0);
-  bar.innerHTML = n ? `<span>${syncing ? '⏳ Đang đồng bộ' : '⚠️ Chưa đồng bộ'} ${n} giao dịch</span>` +
+  bar.innerHTML = n ? `<span>${syncing ? '⏳ Đang đồng bộ' : '⚠️ Chưa đồng bộ'} ${n} thay đổi</span>` +
     (syncing ? '' : '<button type="button" data-pick="retry">Thử lại</button>') : '';
 }
 
@@ -521,7 +660,9 @@ async function syncQueue() {
     while (getQ().length) {
       const item = getQ()[0];
       try {
-        await api('add', item);
+        if (item.op === 'update') await api('update', item);
+        else if (item.op === 'delete') await api('delete', { id: item.id });
+        else await api('add', item);
         clearApiCache();
         savedAny = true;
         const q = getQ(); q.shift(); setQ(q);
@@ -529,7 +670,8 @@ async function syncQueue() {
         if (err.net) break;                       // mất mạng: giữ lại, thử lại sau
         const q = getQ(); q.shift(); setQ(q);     // máy chủ từ chối: báo lý do rồi bỏ khỏi hàng chờ
         haptic('error');
-        toast('Không lưu được ' + fmt(item.money) + 'đ: ' + err.message);
+        const what = item.op === 'delete' ? 'xóa giao dịch' : (item.op === 'update' ? 'sửa ' : 'lưu ') + fmt(item.money) + 'đ';
+        toast('Không ' + what + ': ' + err.message);
       }
     }
   } finally {
@@ -545,6 +687,24 @@ $('saveBtn').addEventListener('click', () => {
   if (!state.amount) return toast('Nhập số tiền trước nhé');
   if (!state.source) return toast('Chọn nguồn tiền');
   if (!state.menu) return toast('Chọn danh mục');
+  const back = returnTabAfterSave || 'lookup';
+
+  if (state.editId) {                                // đang sửa giao dịch có sẵn
+    const date = $('date').value;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return toast('Chọn ngày hợp lệ');
+    const item = {
+      op: 'update', id: state.editId, type: state.type, date, source: state.source, menu: state.menu,
+      sub: state.sub, note: $('note').value, person: state.person, money: state.amount,
+    };
+    const q = getQ(); q.push(item); setQ(q);
+    haptic('success');
+    toast('Đã lưu thay đổi, đang đồng bộ…');
+    exitEdit();
+    showTab(back);
+    syncQueue();
+    return;
+  }
+
   const item = {
     cid: newCid(), type: state.type, date: state.date, source: state.source, menu: state.menu,
     sub: state.sub, note: $('note').value, person: state.person, money: state.amount,
@@ -552,10 +712,9 @@ $('saveBtn').addEventListener('click', () => {
   const q = getQ(); q.push(item); setQ(q);          // lưu vào máy trước, không mất dù đóng app
   haptic('success');
   toast('Đã ghi ' + fmt(item.money) + 'đ');
-  setAmount(0); $('note').value = ''; state.menu = ''; state.sub = ''; state.person = ''; renderChoices();
-  const returnTab = returnTabAfterSave || 'lookup';
+  resetFormFields(); renderChoices();
   returnTabAfterSave = 'lookup';
-  showTab(returnTab);                                // quay về tab đã mở form
+  showTab(back);                                     // quay về tab đã mở form
   syncQueue();                                       // gửi lên sheet chạy ngầm
 });
 
@@ -563,6 +722,7 @@ window.addEventListener('online', syncQueue);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) syncQueue(); });
 
 /* ---------- TRA CỨU THEO NGÀY ---------- */
+let dayItems = {};
 async function loadDay() {
   $('dayList').innerHTML = '<span class="muted">Đang tải...</span>';
   try {
@@ -571,13 +731,16 @@ async function loadDay() {
     const totalThu = moneyNumber(d.totalThu);
     $('sumChi').textContent = fmt(totalChi) + 'đ'; $('cntChi').textContent = d.countChi + ' giao dịch';
     $('sumThu').textContent = fmt(totalThu) + 'đ'; $('cntThu').textContent = d.countThu + ' giao dịch';
+    dayItems = {};
+    d.items.forEach(it => { if (it.id) dayItems[it.id] = Object.assign({}, it, { date: d.date || state.date }); });
     $('dayList').innerHTML = d.items.length ? d.items.map(it => {
       const amount = moneyNumber(it.money);
       return `
       <div class="item">
-        <div><div>${esc(it.menu)}${it.sub ? ' · ' + esc(it.sub) : ''}</div>
-        <small>${esc(it.source)}${it.person ? ' · ' + esc(it.person) : ''}${it.note ? ' · ' + esc(it.note) : ''}</small></div>
+        <div class="m"><div>${esc(it.menu)}${it.sub ? ' · ' + esc(it.sub) : ''}</div>
+        <small>${esc(it.source)}${cleanPerson(it.person) ? ' · ' + esc(cleanPerson(it.person)) : ''}${it.note ? ' · ' + esc(it.note) : ''}</small></div>
         <div class="amt" style="color:var(--${it.type === 'Thu' ? 'thu' : 'chi'})">${it.type === 'Thu' ? '+' : '-'}${fmt(amount)}đ</div>
+        ${it.id ? `<button type="button" class="pen" data-edit="${esc(it.id)}" aria-label="Sửa giao dịch ${esc(it.menu)} ${fmt(amount)} đồng">Sửa</button>` : ''}
       </div>`;
     }).join('') : '<span class="muted">Ngày này chưa có giao dịch nào.' + latestNote(d.lastDate) + '</span>';
   } catch (err) {
@@ -649,6 +812,7 @@ function refreshActive() {
   if (vis('lookup')) loadDay();
   if (vis('month')) loadMonth();
   if (vis('chart')) loadChart();
+  if (vis('debt')) loadDebt();
   if (vis('credit')) loadCredit();
   loadBalance();
 }
@@ -734,6 +898,61 @@ async function loadChart() {
   }
 }
 
+/* ---------- TAB CÔNG NỢ ---------- */
+let debtKind = 'rec', debtData = null, debtView = [];
+const DEBT_LBL = { lent: ['Cho mượn', 'dout', '-'], rec: ['Thu hồi', 'din', '+'], borrow: ['Mượn tiền', 'din', '+'], repay: ['Trả nợ', 'dout', '-'] };
+
+function debtRows() {
+  if (!debtData) return [];
+  return debtData.people.map(p => debtKind === 'rec'
+    ? { n: p.name, a: p.lent, b: p.rec, left: p.lent - p.rec, la: 'Đã cho mượn', lb: 'đã thu hồi', h: p.hist.filter(x => x[1] === 'lent' || x[1] === 'rec') }
+    : { n: p.name, a: p.borrow, b: p.repay, left: p.borrow - p.repay, la: 'Đã mượn', lb: 'đã trả', h: p.hist.filter(x => x[1] === 'borrow' || x[1] === 'repay') }
+  ).filter(r => r.a || r.b).sort((x, y) => y.left - x.left);
+}
+const debtStatus = r => r.left > 0 ? ['Còn nợ', 'owe'] : (r.left === 0 ? ['Đã trả hết', 'done'] : ['Trả dư ' + fmt(-r.left) + 'đ', 'over']);
+
+function renderDebt() {
+  document.querySelectorAll('[data-pick="dkind"]').forEach(b => b.classList.toggle('on', b.dataset.v === debtKind));
+  if (!debtData) return;
+  debtView = debtRows();
+  $('debtList').innerHTML = debtView.length ? debtView.map((r, i) => {
+    const s = debtStatus(r), pct = r.a ? Math.min(100, Math.round(r.b / r.a * 100)) : 0;
+    const act = debtKind === 'rec' ? (r.left > 0 ? 'Ghi thu hồi từ ' : '') : (r.left > 0 ? 'Ghi trả nợ cho ' : '');
+    return `<div class="dp"><button type="button" class="dph" aria-expanded="false">
+        <div class="dtop"><span class="dnm">${esc(r.n)}<span class="dtag ${s[1]}">${s[0]}</span></span><span class="drem">${r.left > 0 ? fmt(r.left) + 'đ' : '0đ'}</span></div>
+        <div class="dsub"><span>${r.la} ${fmt(r.a)}đ</span><span>${r.lb} ${fmt(r.b)}đ</span></div>
+        <div class="dbar"><i style="width:${pct}%"></i></div></button>
+      <div class="ddet">${r.h.map(x => `<div class="dh"><div>${DEBT_LBL[x[1]][0]}<small>${fmtDMY(x[0])}${x[3] && normKey(x[3]) !== normKey(r.n) ? ' · ' + esc(x[3]) : ''}</small></div><span class="${DEBT_LBL[x[1]][1]}">${DEBT_LBL[x[1]][2]}${fmt(x[2])}đ</span></div>`).join('')}
+        ${act ? `<button type="button" class="dact" data-pick="dact" data-v="${i}">${act}${esc(r.n)}</button>` : ''}</div></div>`;
+  }).join('') : '<div class="card muted">Chưa có khoản nào.</div>';
+
+  const rec = debtData.people.reduce((s, p) => s + Math.max(0, p.lent - p.rec), 0);
+  const pay = debtData.people.reduce((s, p) => s + Math.max(0, p.borrow - p.repay), 0);
+  $('dSumRec').textContent = fmt(rec) + 'đ';
+  $('dSumPay').textContent = fmt(pay) + 'đ';
+  $('dCapRec').textContent = debtData.people.filter(p => p.lent - p.rec > 0).length + ' người còn nợ bạn';
+  $('dCapPay').textContent = pay ? debtData.people.filter(p => p.borrow - p.repay > 0).length + ' người bạn còn nợ' : 'Bạn không nợ ai';
+
+  const u = debtData.unlinked || [];
+  const parts = [];
+  if (u.length) {
+    parts.push(`<b>Cần kiểm tra: ${u.length} khoản Thu nhập có ghi chú chứa tên người</b> (tổng ${fmt(u.reduce((s, x) => s + x.money, 0))}đ). Nếu đó là tiền trả nợ, chạm vào khoản đó, đổi danh mục thành “Cho Vay, trả nợ”, mục con “nhận tiền cho vay” và chọn người.` +
+      u.map((x, i) => `<button type="button" class="dh" data-pick="dedit" data-v="${i}"><div>${esc(x.guess || '')}<small>${fmtDMY(x.date)} · ${esc(x.note)}</small></div><span class="din">+${fmt(x.money)}đ</span></button>`).join(''));
+  }
+  if (debtData.noPerson) parts.push(`${debtData.noPerson} giao dịch vay/nợ chưa gắn người nên chưa được tính ở đây. Mở Tra cứu để sửa.`);
+  $('debtChk').innerHTML = parts.length ? `<div class="dchk">${parts.join('<br><br>')}</div>` : '';
+}
+
+async function loadDebt() {
+  $('debtList').innerHTML = '<span class="muted">Đang tải...</span>';
+  try {
+    debtData = await api('debt');
+    renderDebt();
+  } catch (err) {
+    $('debtList').innerHTML = '<span class="err">Lỗi: ' + esc(err.message) + '</span>';
+  }
+}
+
 /* ---------- TAB TÍN DỤNG ---------- */
 let creditMonth = todayStr().slice(0, 7);
 $('creditMonth').value = creditMonth;
@@ -765,7 +984,7 @@ async function loadCredit() {
 
     const head = `<div class="item"><b>Tổng chi tín dụng tháng ${m}/${y}</b><b class="amt" style="color:var(--chi)">${fmt(d.totalChi)}đ</b></div>`;
     $('crList').innerHTML = head + (d.items.length ? d.items.map(it => `
-      <div class="item"><div><div>${esc(it.menu)}${it.sub ? ' · ' + esc(it.sub) : ''}</div>
+      <div class="item"><div class="m"><div>${esc(it.menu)}${it.sub ? ' · ' + esc(it.sub) : ''}</div>
         <small>${fmtDM(it.date)}${it.note ? ' · ' + esc(it.note) : ''}</small></div>
         <div class="amt" style="color:var(--${it.type === 'Thu' ? 'thu' : 'chi'})">${it.type === 'Thu' ? '+' : '-'}${fmt(it.money)}đ</div></div>`).join('')
       : '<span class="muted">Tháng này chưa có giao dịch tín dụng.</span>');
@@ -778,7 +997,8 @@ async function loadCredit() {
 /* ---------- KHỞI ĐỘNG ---------- */
 function applyMeta(m) {
   state.categories = m.categories || []; state.people = m.people || []; state.history = m.history || []; state.loaded = true;
-  fixSelection(); renderChoices();
+  if (!state.editId) fixSelection();
+  renderChoices();
 }
 
 async function init() {
